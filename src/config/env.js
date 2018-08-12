@@ -1,7 +1,6 @@
-export const DARK_SKY_CONFIG = {
-    "API_KEY": "123456789"
+export const CONFIG_DARK_SKY = {
+    "API_KEY": "potato"
 }
 
-// export const FACEBOOK_CONFIG = {
-//     "APP_ID": "190304735026607"
-// }
+export const FACEBOOK_CONFIG = {
+    "APP_ID": "123456789"
