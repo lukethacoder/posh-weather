@@ -7,6 +7,12 @@ body {
   background: linear-gradient(to right, $gradient-grey-dark 0%,$gradient-grey-light 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$gradient-grey-dark', endColorstr='$gradient-grey-light',GradientType=1 ); /* IE6-9 */
 }
+.loading-component {
+  width: 100vw;
+  height: 50vh;
+  background-color: pink;
+  color: red;
+}
 .App {
   display: grid;
   align-content: center;

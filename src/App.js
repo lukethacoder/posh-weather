@@ -1,10 +1,21 @@
 import React, { Component } from 'react';
 import './App.css';
 import { DarkSkyApiData } from './components/dark-sky-data'
+import Loading from './components/loading'
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      loading: true
+    }
+  }
+
+  componentDidMount() {
+    console.log(DarkSkyApiData)
+  }
   render() {
-    console.log(DarkSkyApiData.data)
     return (
       <div className="App">
         <header className="App-header">
