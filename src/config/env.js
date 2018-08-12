@@ -4,3 +4,4 @@ export const CONFIG_DARK_SKY = {
 
 export const FACEBOOK_CONFIG = {
     "APP_ID": "123456789"
+}
