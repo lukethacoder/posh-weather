@@ -4,8 +4,6 @@
 
 // re-enable before pushing live 
 // import axios from 'axios'
-// const apiKey = CONFIG_DARK_SKY.API_KEY;
-// const darkSkyUrl = "https://api.darksky.net/forecast/"
 
 // import { userData } from './config/user-data'
 // import { CONFIG_DARK_SKY } from './config/env'
@@ -22,6 +20,10 @@ import WelcomeSlider from './components/welcome-component'
 import logo from './images/posh_weather.svg'
 import { colors, fonts } from './config/_variables'
 
+
+// const apiKey = CONFIG_DARK_SKY.API_KEY;
+// const darkSkyUrl = "https://api.darksky.net/forecast/"
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -33,7 +35,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    console.log('ran checkLocalStorage()');
+    // checks local storage if user has entered a name
     if (typeof localStorage === "undefined" || localStorage === null) {
       let LocalStorage = require('node-localstorage').LocalStorage;
       // eslint-disable-next-line
@@ -83,7 +85,10 @@ class App extends Component {
           <img src={logo} alt="posh weather logo. Golden P with Posh weather written below."/>
         </Header>
         <MainContentContainer>
-          <WelcomeSlider/>
+          {/* <button onClick={ () => this.getAllWeatherData()}>Click me for weather</button> */}
+          <WelcomeSliderContainer>
+            <WelcomeSlider/>
+          </WelcomeSliderContainer>
         </MainContentContainer>
         <Footer/>
       </AppContainer>
@@ -93,11 +98,22 @@ class App extends Component {
 
 export default App;
 
+const WelcomeSliderContainer = styled.div`
+  min-width: 50%;
+  max-height: 250px;
+  /* background-color: green; */
+  padding: 10% 25%;
+  position: relative;
+  display: block;
+}
+`
+
 const AppContainer = styled.div`
   width: 100%;
   margin: 0;
   padding: 0;
   font-family: ${fonts.sans};
+  min-height: 100vh;
 
   /* Gradients for dayz */
   background-color: ${colors.gradientGreyDark};
@@ -110,13 +126,10 @@ const AppContainer = styled.div`
 
 const MainContentContainer = styled.section`
   width: 100%;
-  min-height: 80vh;
+  height: auto;
   margin: 0;
   padding: 0;
-  /* display: grid;
-  align-content: center;
-  justify-content: center;
-  text-align: center; */
+  display: block;
 `
 
 const Header = styled.header`

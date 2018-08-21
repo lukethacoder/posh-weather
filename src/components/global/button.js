@@ -1,20 +1,29 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
 import {colors, fonts } from '../../config/_variables'
+import { GoChevronRight } from 'react-icons/go'
 
 class Button extends Component {
-    render() {
+  checkIcon(icon) {
+    if (icon === "GoChevronRight") {
       return (
-        <ButtonThis>
-            {this.props.label}
-        </ButtonThis>
-      );
+        <GoChevronRight/>
+      )
     }
   }
+  render() {
+    return (
+      <ButtonThis>
+          {this.props.label}
+          {this.checkIcon(this.props.icon)}
+      </ButtonThis>
+    );
+  }
+}
 
 export default Button
 
-const ButtonThis = styled.button`
+const ButtonThis = styled.div`
   padding: 8px 16px;
   font-family: ${fonts.serif};
   background-color: transparent;
@@ -24,9 +33,17 @@ const ButtonThis = styled.button`
   font-family: ${fonts.sans};
   font-size: 1rem;
   transition: .5s;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  justify-self: center;
+  align-self: center;
+  svg {
+    display: inline-flex;
+  }
   &:hover {
       background-color: ${colors.gold};
       opacity: .5;
-      color
+      color: ${colors.darkGrey}
   }
 `
