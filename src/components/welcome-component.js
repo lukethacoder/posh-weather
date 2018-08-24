@@ -48,9 +48,11 @@ class WelcomeSlider extends Component {
                         />
                         <Slides className="Slides" offset={1}
                             onClick={() => this.scroll(2)}
-                            caption={<p>
-                                Jolly good to make your acquaintance. <br/>What may your name be?
-                            </p>}
+                            caption={
+                            <div>
+                                <p>Jolly good to make your acquaintance. <br/>What may your name be?</p>
+                                <input id="name" type="text" onChange={(evt) => { console.log(evt.target.value); }}/>
+                            </div>}
                         />
                         <Slides className="Slides" offset={2}
                             onClick={() => this.scroll(0)}

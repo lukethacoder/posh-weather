@@ -3,26 +3,26 @@
 // user for testing: https://api.darksky.net/forecast/ API_KEY_HERE /35.2384,149.0838
 
 // re-enable before pushing live 
-// import axios from 'axios'
+// import axios from 'axios';
 
-// import { userData } from './config/user-data'
-// import { CONFIG_DARK_SKY } from './config/env'
+// import { userData } from './config/user-data';
+// import { CONFIG_DARK_SKY } from './config/env';
 
 // packages
-import React, { Component } from 'react'
-import styled from 'styled-components'
-// import localStorage from 'node-localstorage'
+import React, { Component } from 'react';
+import styled from 'styled-components';
+// import localStorage from 'node-localstorage';
 
 // components
-import Loading from './components/loading'
-import Footer from './components/footer'
-import WelcomeSlider from './components/welcome-component'
-import logo from './images/posh_weather.svg'
-import { colors, fonts } from './config/_variables'
+import Loading from './components/loading';
+import Footer from './components/footer';
+import WelcomeSlider from './components/welcome-component';
+import logo from './images/posh_weather.svg';
+import { colors, fonts } from './config/_variables';
 
 
 // const apiKey = CONFIG_DARK_SKY.API_KEY;
-// const darkSkyUrl = "https://api.darksky.net/forecast/"
+// const darkSkyUrl = "https://api.darksky.net/forecast/";
 
 class App extends Component {
   constructor(props) {
@@ -74,13 +74,12 @@ class App extends Component {
   render() {
 
     if (this.state.loading === true) {
-      return (
-        <Loading/>
-      );
+      return <Loading/>
     }
 
     return (
       <AppContainer className="App">
+        <TopBar></TopBar>
         <Header className="App-header">
           <img src={logo} alt="posh weather logo. Golden P with Posh weather written below."/>
         </Header>
@@ -97,6 +96,11 @@ class App extends Component {
 }
 
 export default App;
+
+const TopBar = styled.div`
+  width: 100%;
+  height: 25px;
+`
 
 const WelcomeSliderContainer = styled.div`
   min-width: 50%;
