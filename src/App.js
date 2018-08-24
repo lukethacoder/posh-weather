@@ -42,8 +42,8 @@ class App extends Component {
       localStorage = new LocalStorage('./scratch');
     }
 
-    localStorage.setItem('username', 'John');
-    console.log(localStorage.getItem('username'));
+    // localStorage.setItem('username', 'John');
+    // console.log(localStorage.getItem('username'));
     this.setState({
       username: localStorage.getItem('username')
     })
@@ -71,6 +71,10 @@ class App extends Component {
   //   )
   // }
 
+  editName(e) {
+
+  }
+
   render() {
 
     if (this.state.loading === true) {
@@ -79,7 +83,9 @@ class App extends Component {
 
     return (
       <AppContainer className="App">
-        <TopBar></TopBar>
+        <TopBar>
+          <p>{localStorage.getItem('username')}</p> // add onClick to edit name
+        </TopBar>
         <Header className="App-header">
           <img src={logo} alt="posh weather logo. Golden P with Posh weather written below."/>
         </Header>
@@ -98,8 +104,15 @@ class App extends Component {
 export default App;
 
 const TopBar = styled.div`
+  position: fixed;
+  top: 0;
   width: 100%;
-  height: 25px;
+  height: auto;
+  p {
+    color: ${colors.gold};
+    font-size: 1rem;
+    padding: 1% 5%;
+  }
 `
 
 const WelcomeSliderContainer = styled.div`

@@ -1,69 +1,76 @@
-import React, { Component, Fragment } from 'react'
-import { Parallax } from 'react-spring'
+import React, { Component } from 'react'
+import { Transition, animated } from 'react-spring'
 import styled from 'styled-components'
 
 // components
 import {colors, fonts } from '../config/_variables'
-import Button from './global/button'
+// import Button from './global/button'
 
-const Slides = ({ offset, caption, onClick}) => (
-    <Fragment>
-        <SlideItem className="slideItem">
-            <Parallax.Layer offset={offset} speed={0.5}>
-                {caption}
-            </Parallax.Layer>
-
-            <Parallax.Layer offset={offset} speed={0}>
-                <div onClick={onClick} >
-                    <Button label="next" icon="GoChevronRight"/>
-                    
-                </div>
-            </Parallax.Layer>
+const pages = [
+    style => <animated.div style={{ ...style}}>
+        <SlideItem>
+            <p>Welcome to Posh Weather. <br/>
+            {console.log(this)}
+            We believe in giving you the best weather experience money can buy</p>
         </SlideItem>
-    </Fragment>
-)
+    </animated.div>,
+    style => <animated.div style={{ ...style}}>
+        <SlideItem>
+            <p>Jolly good to make your acquaintance. <br/>What may your name be?</p>
+            <input id="name" type="text"
+                // onBlur={ () => {
+                //     localStorage.setItem('username', 'dang');
+                //     console.log(localStorage.getItem('username'));
+                // }}
+                onChange={(evt) => { console.log(evt.target.value); localStorage.setItem('username', evt.target.value);}}
+            />
+        </SlideItem>
+    </animated.div>,
+    style => <animated.div style={{ ...style}}>
+        <SlideItem>
+            <p>We hope you enjoy your stay</p>
+        </SlideItem>
+    </animated.div>
+];
 
 class WelcomeSlider extends Component {
     constructor(props) {
         super(props);
     
         this.state = {
-            userName: "steve",
-            userLocation: "Canberra ACT"
+            user: "steve",
+            userLocation: "Canberra ACT",
+            index: 0
         }
+
+        this.toggle = this.toggle.bind(this);
     }
 
-    scroll = to => this.refs.parallax.scrollTo(to)
+    toggle = e => this.setState(state => ({ index: state.index === 3 ? 0 : state.index + 1 }))
 
     render() {
+        
+        console.log(localStorage.getItem('username'));
+        if (this.state.index !== 3) {
+            return (
+                <WelcomeContainer>
+                    <SlideItem>
+                        <Transition
+                            native
+                            from={{ opacity: 0, transform: 'translate3d(200%,0,0)' }}
+                            enter={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
+                            leave={{ opacity: 0, transform: 'translate3d(0,0,0)' }}
+                        >
+                            {pages[this.state.index]}
+                        </Transition>
+                    </SlideItem>
+                    <button onClick={this.toggle}>Next</button>
+                </WelcomeContainer>
+            )
+        }
         return (
             <WelcomeContainer>
-                <section className="holdsParallax" style={{backgroundColor: "purple"}}>
-                    <Parallax ref="parallax" pages={3} horizontal scrolling={false}>
-                        <Slides className="Slides" offset={0}
-                            onClick={() => this.scroll(1)}
-                            caption={<p>
-                                Welcome to Posh Weather. <br/>We believe in giving you the best weather experience money can buy
-                            </p>}
-                        />
-                        <Slides className="Slides" offset={1}
-                            onClick={() => this.scroll(2)}
-                            caption={
-                            <div>
-                                <p>Jolly good to make your acquaintance. <br/>What may your name be?</p>
-                                <input id="name" type="text" onChange={(evt) => { console.log(evt.target.value); }}/>
-                            </div>}
-                        />
-                        <Slides className="Slides" offset={2}
-                            onClick={() => this.scroll(0)}
-                            caption={<p>
-                                Marvellous to meet you {this.state.userName}.
-                                Our records suggest you reside at {this.state.userLocation}, 
-                                is this correct?
-                            </p>}
-                        />
-                    </Parallax>
-                </section>
+                <a style={{color: 'white'}}>Show me the weather</a>
             </WelcomeContainer>
         )
     }
@@ -72,48 +79,40 @@ class WelcomeSlider extends Component {
 export default WelcomeSlider
 
 const WelcomeContainer = styled.div`
+    position: relative;
     width: auto;
     height: 100%;
     margin: 0;
     font-family: ${fonts.serif};
-    > section {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        height: 100%;
-        > div {
-            /* position: relative !important; */
-            width: 50% !important;
-            /* background-color: burlywood; */
-            /* > div {
-                display: flex;
-                background-color: orange;
-                width: 100%;
-            } */
-        }
+    h2 {
+        color: white;
+        position: absolute;
+        top: 0;
+    }
+    button {
+        position: absolute;
+        bottom: 20%;
+        /* right: 20%; */
+        width: auto;
+        padding: 0;
+        font-size: 1rem;
     }
 `
 
 const SlideItem = styled.div`
-    width: 100% !important;
-    height: auto;
-    display: grid;
-    align-content: center;
+    color: white;
+    position: absolute;
+    width: 100%;
+    height: 450px;
+    display: block;
     justify-content: center;
-    background-color: navy;
-    > div {
+    align-content: center;
+    will-change: transform, opacity;
+    div {
         p {
             text-align: left;
             color: ${colors.lightGrey};
             font-size: 2.25rem;
-        }
-        > div {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            > div {
-                display: block;
-            }
         }
     }
 `
