@@ -12,7 +12,7 @@ import { CONFIG_DARK_SKY, MAPBOX_CONFIG } from './config/env';
 // packages
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { Transition, animated } from 'react-spring'
+import { Transition, animated, Spring } from 'react-spring'
 // import localStorage from 'node-localstorage';
 
 // components
@@ -35,6 +35,8 @@ class App extends Component {
       loading: false,
       username: 'User',
       index: 0,
+      geoCodeData: '',
+      renderSearchOptions: []
     }
   }
 
@@ -63,60 +65,56 @@ class App extends Component {
     //   console.log('​App -> getUserLocation -> response.data', response.data);
     // });
 
-    geocodingClient
-  .forwardGeocode({
+    geocodingClient.forwardGeocode({
     query: user_query,
     limit: 2
   })
   .send()
   .then(response => {
     const match = response.body;
+    this.setState({
+      renderSearchOptions: response.body.features
+    });
     console.log('​App -> getUserLocation -> match', match);
   });
 
+  
   // map over array of places
 
-  return (
-    <ul>
-      
-    </ul>
-  )
 
-// geocoding with proximity
-// geocodingClient
-//   .forwardGeocode({
-//     query: 'Paris, France',
-//     proximity: [-95.4431142, 33.6875431]
-//   })
-//   .send()
-//   .then(response => {
-//     const match = response.body;
-//   });
+  // if (this.state.geoCodeData === null || typeof this.state.geoCodeData === undefined || typeof this.state.geoCodeData === undefined) {
+  //   return null
+  // }
+  // else {
+  //   let geoData = this.state.geoCodeData.features;
+  //   console.log('​App -> getUserLocation -> geoData', geoData);
+  //   if (geoData === null || typeof geoData === undefined || geoData === undefined) {
+  //     console.log('​App -> getUserLocation -> geoData', geoData);
+  //     return null
+  //   }
+  //   else {
+  //     let geoKeys = Object.keys(geoData);
+  //     let return_geoData = geoKeys.map((item, i) => {
+  //       console.log('​App -> getUserLocation -> i', i);
+  //       console.log('​App -> getUserLocation -> item', item);
+  //       return (
+  //         <li key={i}>
+  //           {geoData[i]}
+  //         </li>
+  //       )
+  //     });
 
-// geocoding with countries
-// geocodingClient
-//   .forwardGeocode({
-//     query: 'Paris, France',
-//     countries: ['fr']
-//   })
-//   .send()
-//   .then(response => {
-//     const match = response.body;
-//   });
-
-// geocoding with bounding box
-// geocodingClient
-//   .forwardGeocode({
-//     query: 'Paris, France',
-//     bbox: [2.14, 48.72, 2.55, 48.96]
-//   })
-//   .send()
-//   .then(response => {
-//     const match = response.body;
-//   });
-
+  //     this.setState({
+  //       renderSearchOptions: return_geoData
+  //     })
+    
+  //     return (
+  //       {return_geoData}
+  //     )
+  //   }
+  // }
+  
   }
-
   // getAllWeatherData() {
   //   console.log("run getAllWeatherData()")
   //   let getDarkSkyData = new Promise(
@@ -139,10 +137,11 @@ class App extends Component {
   //   )
   // }
 
-
   toggle = e => this.setState(state => ({ index: state.index === 4 ? 0 : state.index + 1 }))
 
   render() {
+
+    const { renderSearchOptions } = this.state;
 
     const pages = [
       style => <animated.div style={{ ...style}}>
@@ -164,8 +163,25 @@ class App extends Component {
           <SlideItem>
               <p>Where are you from?</p>
               <input id="location" type="text"
-                  onChange={(evt) => { this.getUserLocation(evt)}}
+                  onChange={(evt) => { this.forceUpdate(); this.getUserLocation(evt.target.value);}}
               />
+              {
+                
+                renderSearchOptions.map(key =>
+                  <Spring
+                    from={{opacity: 0, paddingTop: "-100px"}} to={{opacity: 1, paddingTop: "0px" }}
+                  >
+                    {styles =>
+                      <li style={styles} key={key.id}
+                        onClick={() => {
+                          this.toggle();
+                          localStorage.setItem('coordinatesArray', key.geometry.coordinates);
+                          console.log(localStorage.getItem('coordinatesArray'))}}
+                      >{key.place_name}</li>
+                    }
+                  </Spring>
+                )
+              }
           </SlideItem>
       </animated.div>,
       style => <animated.div style={{ ...style}}>
@@ -222,7 +238,7 @@ class App extends Component {
           <img src={logo} alt="posh weather logo. Golden P with Posh weather written below."/>
         </Header>
         <MainContentContainer>
-          {this.getUserLocation()}
+          {/* {this.getUserLocation()} */}
           {content}
           {welcomeSlider}
         </MainContentContainer>
