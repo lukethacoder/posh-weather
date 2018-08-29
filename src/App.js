@@ -33,7 +33,13 @@ class App extends Component {
       allWeatherData: placeholder,
       geoCodeData: '',
       renderSearchOptions: [],
-      interimLocationVal: ''
+      interimLocationVal: '',
+      bareView: true,
+      extendedView: false,
+      DailyForecast: false,
+      WeeklyForecast: false,
+      ExtensiveWeather: false,
+      ClassyAudio: false,
     }
   }
 
@@ -102,16 +108,13 @@ class App extends Component {
 
     let lon = localStorage.getItem('location_lon');
     let lat = localStorage.getItem('location_lat');
-    // axios.get(darkSkyUrl + apiKey + "/" + lat + "," + lon +"")
-    //   .then(function(result) {
-    //     let content = result.data;
-    //     resolve(content)
-    //   }
-    // );
 
     axios({
         method: 'GET',
         url: darkSkyUrl + apiKey + "/" + lat + "," + lon +"",
+        params: {
+          units: "auto"
+        }
     }).then( (response) => {
         if (response === "") {
             alert('error creating timeline entry');
@@ -134,6 +137,14 @@ class App extends Component {
     return returnTime
   }
 
+  editUsername() {
+    console.log("coming soon")
+  }
+
+  editLocation() {
+    console.log("coming soon")
+  }
+
   toggle = e => this.setState(state => ({ index: state.index === 5 ? 0 : state.index + 1 }))
 
   render() {
@@ -145,14 +156,14 @@ class App extends Component {
     const pages = [
       style => <animated.div key="1" style={{ ...style}}>
           <SlideItem>
-              <p>Welcome to Posh Weather. <br/>
+              <SerifText>Welcome to Posh Weather. <br/>
               {console.log(this)}
-              We believe in giving you the best weather experience money can buy</p>
+              We believe in giving you the best weather experience money can buy</SerifText>
           </SlideItem>
       </animated.div>,
       style => <animated.div key="2" style={{ ...style}}>
           <SlideItem>
-              <p>Jolly good to make your acquaintance. <br/>What may your name be?</p>
+              <SerifText>Jolly good to make your acquaintance. <br/>What may your name be?</SerifText>
               <input id="name" type="text" required
                   onChange={(evt) => { console.log(evt.target.value); localStorage.setItem('username', evt.target.value);}}
               />
@@ -160,7 +171,7 @@ class App extends Component {
       </animated.div>,
       style => <animated.div key="3" style={{ ...style}}>
           <SlideItem>
-              <p>Where are you right now?</p>
+              <SerifText>Where are you right now?</SerifText>
               {/* <input id="location" type="text" required
                   onChange={(evt) => {this.forceUpdate(); this.getUserLocation(evt.target.value);}}
               /> */}
@@ -189,7 +200,7 @@ class App extends Component {
       </animated.div>,
       style => <animated.div key="4" style={{ ...style}}>
         <SlideItem>
-            <p>We hope you enjoy your stay</p>
+            <SerifText>We hope you enjoy your experience</SerifText>
         </SlideItem>
     </animated.div>
     ];
@@ -199,15 +210,64 @@ class App extends Component {
     }
 
     let welcomeSlider = null;
-    let content = null;
+    let bareView = null;
+    let extendedView = null;
+    let DailyForecast = null;
+    let WeeklyForecast = null;
+    let ExtensiveWeather = null;
+    let ClassyAudio = null;
 
+    if (this.state.extendedView === true) {
+      extendedView (
+        <div>
+          <H2f>extendedView View</H2f>
+        </div>
+      )
+    }
+
+    if (this.state.DailyForecast === true) {
+      DailyForecast (
+        <div>
+          <H2f>DailyForecast View</H2f>
+        </div>
+      )
+    }
+
+    if (this.state.WeeklyForecast === true) {
+      WeeklyForecast (
+        <div>
+          <H2f>WeeklyForecast View</H2f>
+        </div>
+      )
+    }
+
+    if (this.state.ExtensiveWeather === true) {
+      ExtensiveWeather (
+        <div>
+          <H2f>ExtensiveWeather View</H2f>
+        </div>
+      )
+    }
+
+    if (this.state.ClassyAudio === true) {
+      ClassyAudio (
+        <div>
+          <H2f>ClassyAudio View</H2f>
+        </div>
+      )
+    }
     // content if local Storage exists already (username + location)
     if (this.state.index >= 4) {
       this.getAllWeatherData();
-      content = (
-        <div style={{color: 'white'}}>
-          <h1>{this.state.allWeatherData.currently.temperature}</h1>
-        </div>
+      bareView = (
+        <BareViewContainer style={{color: 'white'}}>
+          <hr/>
+            <div>
+              <H3f style={{textAlign: "center"}}>Currently</H3f>
+              <CurrentWeather style={{textAlign: "center"}}>{Math.round( this.state.allWeatherData.currently.temperature * 10 / 10)}°</CurrentWeather>
+            </div>
+          <hr/>
+        </BareViewContainer>
       )
     }
 
@@ -238,7 +298,7 @@ class App extends Component {
         <Spring delay={1000} from={{opacity: 0, paddingTop: "-100px"}} to={{opacity: 1, paddingTop: "0px" }}>
           {styles =>
             <TopBar style={styles}>
-              <p>{localStorage.getItem('username')} | {localStorage.getItem('location_name')}</p>
+              <p><span onClick={() => this.editUsername}>{localStorage.getItem('username')}</span> | <span onClick={() => this.editLocation}>{localStorage.getItem('location_name')}</span></p>
               <p>{this.getTheDate()}</p>
             </TopBar>
           }
@@ -247,7 +307,12 @@ class App extends Component {
           <img src={logo} alt="posh weather logo. Golden P with Posh weather written below."/>
         </Header>
         <MainContentContainer>
-          {content}
+          {bareView}
+          {extendedView}
+          {DailyForecast}
+          {WeeklyForecast}
+          {ExtensiveWeather}
+          {ClassyAudio}
           {welcomeSlider}
         </MainContentContainer>
         <Footer/>
@@ -257,6 +322,43 @@ class App extends Component {
 }
 
 export default App;
+
+const CurrentWeather = styled.h1`
+  font-family: serif;
+  font-size: 7.5rem;
+  color: ${colors.white};
+`
+const H2f = styled.h2`
+  font-family: serif;
+  color: ${colors.white};
+`
+const H3f = styled.h3`
+  font-family: sans-serif;
+  color: ${colors.gold};
+`
+const SerifText = styled.p`
+  font-family: serif;
+  color: ${colors.white};
+`
+
+const BareViewContainer = styled.div`
+  hr {
+    width: 50%;
+    border-color: ${colors.gold};
+  }
+  div {
+    display: grid;
+    grid-template-rows: 20% 80%;
+    h3 {
+      align-self: flex-end;
+      margin: 48px auto 0 auto;
+    }
+    h1 {
+      align-self: flex-start;
+      margin: 12px auto 48px auto;
+    }
+  }
+`
 
 const TopBar = styled.div`
   /* position: fixed; */
@@ -308,8 +410,8 @@ const MainContentContainer = styled.section`
 
 const Header = styled.header`
   width: 100%;
-  height: 10vh;
-  padding: 5% 0 0 0;
+  height: 12vh;
+  padding: 3% 0 4% 0;
   color: ${colors.white};
   display: grid;
   justify-content: center;

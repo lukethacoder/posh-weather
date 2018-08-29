@@ -6,9 +6,9 @@ const Footer = () => {
     return (
         <FooterContainer classname="loading-component">
             <ul>
-                <li>Built by <a href="">Luke Secomb</a></li>
+                <li>Built by <a href="https://lukesecomb.digital">Luke Secomb</a></li>
                 <li><a href="">see all DLC</a></li>
-                <li>Powered by <a href="">Dark Sky</a></li>
+                <li>Powered by <a href="https://darksky.net/poweredby/" rel="nofollow noreferrer">Dark Sky</a></li>
             </ul>
         </FooterContainer>
     )
