@@ -1,27 +1,20 @@
 import React from 'react'
 import styled from 'styled-components'
-import { colors, fonts } from '../config/_variables';
-// import Lottie from 'react-lottie'
-// import * as animationData from '../config/loading.json'
+import { colors } from '../config/_variables';
+import Lottie from 'react-lottie'
+import * as animationData from '../config/loading.json'
 
 const Loading = () => {
-    // const defaultOptions = {
-    //     loop: true,
-    //     autoplay: true,
-    //     animationData: animationData,
-    //     rendererSettings: {
-    //         preserveAspectRatio: 'xMidyMid slice'
-    //     }
-    // };
+    const defaultOptions = {
+        loop: true,
+        autoplay: true,
+        animationData: animationData,
+    };
     return (
         <LoadingContainer classname="loading-component">
-            {/* <Lottie
+            <Lottie
                 options={defaultOptions}
-                width={60}
-                height={80}
-            /> */}
-            <h1>Loading weather data</h1>
-            <hr></hr>
+            />
         </LoadingContainer>
     )
 }
@@ -37,26 +30,24 @@ const LoadingContainer = styled.div`
     margin: 0;
     padding: 0;
     height: 100%;
+    justify-content: center;
+    align-content: center;
 
     background-color: ${colors.gradientGreyDark};
-    background: ${colors.gradientGreyDark}k; /* Old browsers */
+    background: ${colors.gradientGreyDark}; /* Old browsers */
     background: -moz-linear-gradient(left, ${colors.gradientGreyDark} 0%, ${colors.gradientGreyLight} 100%); /* FF3.6-15 */
     background: -webkit-linear-gradient(left, ${colors.gradientGreyDark} 0%, ${colors.gradientGreyLight} 100%); /* Chrome10-25,Safari5.1-6 */
     background: linear-gradient(to right, ${colors.gradientGreyDark} 0%, ${colors.gradientGreyLight} 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='${colors.gradientGreyDark}', endColorstr='${colors.gradientGreyLight}',GradientType=1 ); /* IE6-9 */
-
-    h1 {
-        font-family: ${fonts.sans};
-        color: ${colors.gold};
-        align-self: flex-end;
-        justify-self: center;
-    }
-    hr {
-        height: 2px;
-        width: 20%;
-        color: ${colors.gold};
-        background-color: ${colors.gold};
-        align-self: flex-start;
-        justify-self: center;
+    div {
+        height: 75%;
+        width: 75%;
+        justify-content: center;
+        align-content: center;
+        svg {
+            path {
+                stroke: ${colors.gold};
+            }
+        }
     }
 `

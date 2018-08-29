@@ -15,13 +15,13 @@
     "react-lottie": "^1.2.3",
     "react-scripts": "1.1.4",
     "react-spring": "^5.6.6",
-    "styled-components": "^3.4.2",
-    "yarn-run-all": "^3.1.1"
+    "styled-components": "^3.4.2"
   },
   "scripts": {
     "build-css": "node-sass-chokidar --include-path ./src/App.scss --include-path ./node_modules src/App.scss -o",
     "watch-css": "npm run build-css && node-sass-chokidar --include-path ./src --include-path ./node_modules src/ -o src/ --watch --recursive",
     "start-js": "react-scripts start",
+    "https": "HTTPS=true npm run start",
     "start": "npm-run-all start-js",
     "build-js": "react-scripts build",
     "build": "npm-run-all build-css build-js",

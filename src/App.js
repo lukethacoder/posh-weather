@@ -1,15 +1,10 @@
 
 
-// user for testing: https://api.darksky.net/forecast/ API_KEY_HERE /35.2384,149.0838
-
-// re-enable before pushing live 
-import axios from 'axios';
-
-// eslint-disable-next-line
 import { CONFIG_DARK_SKY, MAPBOX_CONFIG } from './config/env';
 
 // packages
 import React, { Component } from 'react';
+import axios from 'axios';
 import styled from 'styled-components';
 import { Transition, animated, Spring } from 'react-spring'
 
@@ -18,6 +13,8 @@ import Loading from './components/loading';
 import Footer from './components/footer';
 import logo from './images/posh_weather.svg';
 import { colors, fonts } from './config/_variables';
+import placeholder from './config/placeholder_weather'
+import { dayOfWeek, getTheMonth, dateInMonth } from './config/date_data'
 
 // global variables
 const apiKey = CONFIG_DARK_SKY.API_KEY;
@@ -33,6 +30,7 @@ class App extends Component {
     this.state = {
       loading: false,
       index: 0,
+      allWeatherData: placeholder,
       geoCodeData: '',
       renderSearchOptions: [],
       interimLocationVal: ''
@@ -52,11 +50,17 @@ class App extends Component {
       localStorage.setItem('username', 'User');
     }
 
-    if (localStorage.getItem('username') !== 'User' && localStorage.getItem('location_name') !== null) {
+    if (localStorage.getItem('location_name') === null) {
+      localStorage.setItem('location_name', 'Location');
+    }
+
+    if (localStorage.getItem('username') !== 'User' && localStorage.getItem('location_name') !== 'Location') {
       this.setState({
         index: 4
       });
     }
+
+    console.log('placeholder-weather data', this.state.allWeatherData);
   }
 
   getUserLocation(user_query) {
@@ -74,44 +78,17 @@ class App extends Component {
 
   });
 
-  
-  // map over array of places
-
-
-  // if (this.state.geoCodeData === null || typeof this.state.geoCodeData === undefined || typeof this.state.geoCodeData === undefined) {
-  //   return null
-  // }
-  // else {
-  //   let geoData = this.state.geoCodeData.features;
-  //   console.log('​App -> getUserLocation -> geoData', geoData);
-  //   if (geoData === null || typeof geoData === undefined || geoData === undefined) {
-  //     console.log('​App -> getUserLocation -> geoData', geoData);
-  //     return null
-  //   }
-  //   else {
-  //     let geoKeys = Object.keys(geoData);
-  //     let return_geoData = geoKeys.map((item, i) => {
-  //       console.log('​App -> getUserLocation -> i', i);
-  //       console.log('​App -> getUserLocation -> item', item);
-  //       return (
-  //         <li key={i}>
-  //           {geoData[i]}
-  //         </li>
-  //       )
-  //     });
-
-  //     this.setState({
-  //       renderSearchOptions: return_geoData
-  //     })
-    
-  //     return (
-  //       {return_geoData}
-  //     )
-  //   }
-  // }
-  
   }
   getAllWeatherData() {
+    if (this.state.allWeatherData === placeholder) {
+      this.setState({
+        loading: true
+      })
+    }
+
+    if (this.state.index !== 4) {
+      return console.log('you already got the data, stop running');
+    }
     console.log("run getAllWeatherData()")
     if (localStorage.getItem('location_name') === null ||
         localStorage.getItem('location_lon') === null ||
@@ -125,24 +102,36 @@ class App extends Component {
 
     let lon = localStorage.getItem('location_lon');
     let lat = localStorage.getItem('location_lat');
-    let getDarkSkyData = new Promise(
-      function(resolve, reject) {
-        axios.get(darkSkyUrl + apiKey + "/" + lat + "," + lon +"")
-          .then(function(result) {
-            let content = result.data;
-            console.log(content)
-            resolve(content)
-          }
-        );
+    // axios.get(darkSkyUrl + apiKey + "/" + lat + "," + lon +"")
+    //   .then(function(result) {
+    //     let content = result.data;
+    //     resolve(content)
+    //   }
+    // );
+
+    axios({
+        method: 'GET',
+        url: darkSkyUrl + apiKey + "/" + lat + "," + lon +"",
+    }).then( (response) => {
+        if (response === "") {
+            alert('error creating timeline entry');
+        }
+        this.setState(state => ({ index: state.index + 1, allWeatherData: response.data }));
+        console.log('​App -> getAllWeatherData -> this.state.allWeatherData', this.state.allWeatherData);
+    }).then((response) => {
+      if (response !== null || this.state.loading === true) {
+        this.setState({
+          loading: false
+        });
       }
-    );
-    getDarkSkyData.then(
-      function(result) {
-        console.log("result")
-        console.log(result)
-        return result
-      }
-    )
+    });
+    // getDarkSkyData.then((response) => this.setState({allWeatherData: response}));
+  }
+
+  getTheDate() {
+    let today = new Date();
+    let returnTime = dayOfWeek[today.getDay()] + ' ' + dateInMonth[today.getDate()] + ' of ' + getTheMonth[today.getMonth()]; 
+    return returnTime
   }
 
   toggle = e => this.setState(state => ({ index: state.index === 5 ? 0 : state.index + 1 }))
@@ -204,9 +193,6 @@ class App extends Component {
         </SlideItem>
     </animated.div>
     ];
-    
-    console.log(localStorage.getItem('username'));
-    console.log('this.state.index => ', this.state.index);
 
     if (this.state.loading === true) {
       return <Loading/>
@@ -220,7 +206,7 @@ class App extends Component {
       this.getAllWeatherData();
       content = (
         <div style={{color: 'white'}}>
-          23*C
+          <h1>{this.state.allWeatherData.currently.temperature}</h1>
         </div>
       )
     }
@@ -243,6 +229,8 @@ class App extends Component {
           </WelcomeContainer>
         </WelcomeSliderContainer>
       )
+    } else {
+      welcomeSlider = null;
     }
 
     return (
@@ -251,7 +239,7 @@ class App extends Component {
           {styles =>
             <TopBar style={styles}>
               <p>{localStorage.getItem('username')} | {localStorage.getItem('location_name')}</p>
-              <p>3:15 | Tuesday 21st of August</p>
+              <p>{this.getTheDate()}</p>
             </TopBar>
           }
         </Spring>
@@ -271,14 +259,21 @@ class App extends Component {
 export default App;
 
 const TopBar = styled.div`
-  position: fixed;
-  top: 0;
+  /* position: fixed; */
+  /* top: 0; */
   width: 100%;
   height: auto;
+  display: grid;
+  grid-template-columns: 50% 50%;
+  grid-auto-rows: 1fr;
   p {
+    text-transform: uppercase;
     color: ${colors.gold};
     font-size: 1rem;
     padding: 1% 5%;
+    &:nth-of-type(2) {
+      text-align: right;
+    }
   }
 `
 
