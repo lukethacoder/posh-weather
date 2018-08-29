@@ -5,7 +5,6 @@
 // re-enable before pushing live 
 import axios from 'axios';
 
-// import { userData } from './config/user-data';
 // eslint-disable-next-line
 import { CONFIG_DARK_SKY, MAPBOX_CONFIG } from './config/env';
 
@@ -13,7 +12,6 @@ import { CONFIG_DARK_SKY, MAPBOX_CONFIG } from './config/env';
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { Transition, animated, Spring } from 'react-spring'
-// import localStorage from 'node-localstorage';
 
 // components
 import Loading from './components/loading';
@@ -21,8 +19,9 @@ import Footer from './components/footer';
 import logo from './images/posh_weather.svg';
 import { colors, fonts } from './config/_variables';
 
-// const apiKey = CONFIG_DARK_SKY.API_KEY;
-// const darkSkyUrl = "https://api.darksky.net/forecast/";
+// global variables
+const apiKey = CONFIG_DARK_SKY.API_KEY;
+const darkSkyUrl = "https://api.darksky.net/forecast/";
 
 const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
 const geocodingClient = mbxGeocoding({ accessToken: MAPBOX_CONFIG.KEY });
@@ -33,10 +32,10 @@ class App extends Component {
 
     this.state = {
       loading: false,
-      username: 'User',
       index: 0,
       geoCodeData: '',
-      renderSearchOptions: []
+      renderSearchOptions: [],
+      interimLocationVal: ''
     }
   }
 
@@ -46,28 +45,24 @@ class App extends Component {
       let LocalStorage = require('node-localstorage').LocalStorage;
       // eslint-disable-next-line
       localStorage = new LocalStorage('./scratch');
+      
     }
 
-    // localStorage.setItem('username', 'John');
-    // console.log(localStorage.getItem('username'));
-    this.setState({
-      username: localStorage.getItem('username')
-    })
+    if (localStorage.getItem('username') === null) {
+      localStorage.setItem('username', 'User');
+    }
+
+    if (localStorage.getItem('username') !== 'User' && localStorage.getItem('location_name') !== null) {
+      this.setState({
+        index: 4
+      });
+    }
   }
 
   getUserLocation(user_query) {
-    // axios({
-    //   method:'get',
-    //   url:'https://api.mapbox.com/geocoding/v5/mapbox.places/19%20band.json?access_token=' + MAPBOX_CONFIG.KEY + 'country=au&autocomplete=true'
-    // })
-    //   .then(function(response) {
-    //   response.data
-    //   console.log('​App -> getUserLocation -> response.data', response.data);
-    // });
-
     geocodingClient.forwardGeocode({
-    query: user_query,
-    limit: 2
+      query: user_query,
+      limit: 5
   })
   .send()
   .then(response => {
@@ -76,6 +71,7 @@ class App extends Component {
       renderSearchOptions: response.body.features
     });
     console.log('​App -> getUserLocation -> match', match);
+
   });
 
   
@@ -115,58 +111,74 @@ class App extends Component {
   // }
   
   }
-  // getAllWeatherData() {
-  //   console.log("run getAllWeatherData()")
-  //   let getDarkSkyData = new Promise(
-  //     function(resolve, reject) {
-  //       axios.get(darkSkyUrl + apiKey + "/35.2384,149.0838")
-  //         .then(function(result) {
-  //           let content = result.data;
-  //           console.log(content)
-  //           resolve(content)
-  //         }
-  //       );
-  //     }
-  //   );
-  //   getDarkSkyData.then(
-  //     function(result) {
-  //       console.log("result")
-  //       console.log(result)
-  //       return result
-  //     }
-  //   )
-  // }
+  getAllWeatherData() {
+    console.log("run getAllWeatherData()")
+    if (localStorage.getItem('location_name') === null ||
+        localStorage.getItem('location_lon') === null ||
+        localStorage.getItem('location_lat') === null
+    ) {
+      // this.getUserLocation(this.state.renderSearchOptions);
+      localStorage.setItem('location_lon', this.state.renderSearchOptions[0].geometry.coordinates[0])
+      localStorage.setItem('location_lat', this.state.renderSearchOptions[0].geometry.coordinates[1])
+      localStorage.setItem('location_name', this.state.renderSearchOptions[0].place_name)
+    }
 
-  toggle = e => this.setState(state => ({ index: state.index === 4 ? 0 : state.index + 1 }))
+    let lon = localStorage.getItem('location_lon');
+    let lat = localStorage.getItem('location_lat');
+    let getDarkSkyData = new Promise(
+      function(resolve, reject) {
+        axios.get(darkSkyUrl + apiKey + "/" + lat + "," + lon +"")
+          .then(function(result) {
+            let content = result.data;
+            console.log(content)
+            resolve(content)
+          }
+        );
+      }
+    );
+    getDarkSkyData.then(
+      function(result) {
+        console.log("result")
+        console.log(result)
+        return result
+      }
+    )
+  }
+
+  toggle = e => this.setState(state => ({ index: state.index === 5 ? 0 : state.index + 1 }))
 
   render() {
 
     const { renderSearchOptions } = this.state;
 
+
+    // welcome slides (if no local storage data)
     const pages = [
-      style => <animated.div style={{ ...style}}>
+      style => <animated.div key="1" style={{ ...style}}>
           <SlideItem>
               <p>Welcome to Posh Weather. <br/>
               {console.log(this)}
               We believe in giving you the best weather experience money can buy</p>
           </SlideItem>
       </animated.div>,
-      style => <animated.div style={{ ...style}}>
+      style => <animated.div key="2" style={{ ...style}}>
           <SlideItem>
               <p>Jolly good to make your acquaintance. <br/>What may your name be?</p>
-              <input id="name" type="text"
+              <input id="name" type="text" required
                   onChange={(evt) => { console.log(evt.target.value); localStorage.setItem('username', evt.target.value);}}
               />
           </SlideItem>
       </animated.div>,
-      style => <animated.div style={{ ...style}}>
+      style => <animated.div key="3" style={{ ...style}}>
           <SlideItem>
-              <p>Where are you from?</p>
-              <input id="location" type="text"
-                  onChange={(evt) => { this.forceUpdate(); this.getUserLocation(evt.target.value);}}
+              <p>Where are you right now?</p>
+              {/* <input id="location" type="text" required
+                  onChange={(evt) => {this.forceUpdate(); this.getUserLocation(evt.target.value);}}
+              /> */}
+              <input id="location" type="text" required
+                  onChange={(evt) => {this.forceUpdate(); this.getUserLocation(evt.target.value);}}
               />
               {
-                
                 renderSearchOptions.map(key =>
                   <Spring
                     from={{opacity: 0, paddingTop: "-100px"}} to={{opacity: 1, paddingTop: "0px" }}
@@ -175,8 +187,10 @@ class App extends Component {
                       <li style={styles} key={key.id}
                         onClick={() => {
                           this.toggle();
-                          localStorage.setItem('coordinatesArray', key.geometry.coordinates);
-                          console.log(localStorage.getItem('coordinatesArray'))}}
+                          localStorage.setItem('location_lon', key.geometry.coordinates[0]);
+                          localStorage.setItem('location_lat', key.geometry.coordinates[1]);
+                          localStorage.setItem('location_name', key.place_name);
+                        }}
                       >{key.place_name}</li>
                     }
                   </Spring>
@@ -184,7 +198,7 @@ class App extends Component {
               }
           </SlideItem>
       </animated.div>,
-      style => <animated.div style={{ ...style}}>
+      style => <animated.div key="4" style={{ ...style}}>
         <SlideItem>
             <p>We hope you enjoy your stay</p>
         </SlideItem>
@@ -192,24 +206,26 @@ class App extends Component {
     ];
     
     console.log(localStorage.getItem('username'));
+    console.log('this.state.index => ', this.state.index);
 
     if (this.state.loading === true) {
       return <Loading/>
     }
 
     let welcomeSlider = null;
-
-
     let content = null;
+
+    // content if local Storage exists already (username + location)
     if (this.state.index >= 4) {
+      this.getAllWeatherData();
       content = (
         <div style={{color: 'white'}}>
-          hola matey
+          23*C
         </div>
       )
     }
 
-    if (this.state.index !== 3) {
+    if (this.state.index !== 4) {
       welcomeSlider = (
         <WelcomeSliderContainer>
           <WelcomeContainer>
@@ -231,14 +247,18 @@ class App extends Component {
 
     return (
       <AppContainer className="App">
-        <TopBar>
-          <p>{localStorage.getItem('username')}</p>
-        </TopBar>
+        <Spring delay={1000} from={{opacity: 0, paddingTop: "-100px"}} to={{opacity: 1, paddingTop: "0px" }}>
+          {styles =>
+            <TopBar style={styles}>
+              <p>{localStorage.getItem('username')} | {localStorage.getItem('location_name')}</p>
+              <p>3:15 | Tuesday 21st of August</p>
+            </TopBar>
+          }
+        </Spring>
         <Header className="App-header">
           <img src={logo} alt="posh weather logo. Golden P with Posh weather written below."/>
         </Header>
         <MainContentContainer>
-          {/* {this.getUserLocation()} */}
           {content}
           {welcomeSlider}
         </MainContentContainer>
