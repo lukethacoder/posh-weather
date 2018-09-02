@@ -1,17 +1,22 @@
-import React from 'react'
+import React, { Component } from 'react'
 import styled from 'styled-components'
 import {colors, fonts } from '../config/_variables'
 
-const Footer = () => {
-    return (
-        <FooterContainer classname="loading-component">
-            <ul>
-                <li>Built by <a href="https://lukesecomb.digital">Luke Secomb</a></li>
-                <li><a href="">see all DLC</a></li>
-                <li>Powered by <a href="https://darksky.net/poweredby/" rel="nofollow noreferrer">Dark Sky</a></li>
-            </ul>
-        </FooterContainer>
-    )
+class Footer extends Component {
+    removeLocalDLC() {
+        localStorage.clear();
+    }
+    render () {
+        return (
+            <FooterContainer classname="loading-component">
+                <ul>
+                    <li>Built by <a href="https://lukesecomb.digital">Luke Secomb</a></li>
+                    <li onClick={() => this.removeLocalDLC()}>reset Weather Expansion Data</li>
+                    <li>Powered by <a href="https://darksky.net/poweredby/" rel="nofollow noreferrer">Dark Sky</a></li>
+                </ul>
+            </FooterContainer>
+        )
+    }
 }
 
 export default Footer
@@ -40,6 +45,9 @@ const FooterContainer = styled.footer`
         li {
             color: ${colors.white};
             font-size: .75rem;
+            &:nth-of-type(2) {
+                cursor: pointer;
+            }
             a {
                 color: ${colors.gold};
                 text-decoration: none;

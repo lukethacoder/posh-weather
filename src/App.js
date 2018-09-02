@@ -40,8 +40,43 @@ class App extends Component {
       WeeklyForecast: false,
       ExtensiveWeather: false,
       ClassyAudio: false,
-      dlcView: true,
+      dlcView: false,
     }
+  }
+
+  checkUserDLC() {
+    if (localStorage.getItem('ExtendedView') !== null) {
+      this.setState({
+        ExtendedView: true,
+        bareView: false
+      });
+    }
+    if (localStorage.getItem('DailyForecast') !== null) {
+      this.setState({
+        DailyForecast: true
+      });
+    }
+    if (localStorage.getItem('WeeklyForecast') !== null) {
+      this.setState({
+        WeeklyForecast: true
+      });
+    }
+    if (localStorage.getItem('ExtensiveWeather') !== null) {
+      this.setState({
+        ExtensiveWeather: true
+      });
+    }
+    if (localStorage.getItem('ClassyAudio') !== null) {
+      this.setState({
+        ClassyAudio: true
+      });
+    }
+    if (this.state.ExtendedView === false) {
+      this.setState({
+        bareView: true
+      })
+    }
+    console.log('checked localStorage');
   }
 
   componentDidMount() {
@@ -62,36 +97,7 @@ class App extends Component {
     }
 
     // check user DLC 
-    if (localStorage.getItem('extended_view') !== null) {
-      this.setState({
-        ExtendedView: true,
-        bareView: false
-      });
-    }
-    if (localStorage.getItem('daily_forecast') !== null) {
-      this.setState({
-        DailyForecast: true,
-        bareView: false
-      });
-    }
-    if (localStorage.getItem('weekly_forecast') !== null) {
-      this.setState({
-        WeeklyForecast: true,
-        bareView: false
-      });
-    }
-    if (localStorage.getItem('extensive_weather') !== null) {
-      this.setState({
-        ExtensiveWeather: true,
-        bareView: false
-      });
-    }
-    if (localStorage.getItem('class_audio') !== null) {
-      this.setState({
-        ClassyAudio: true,
-        bareView: false
-      });
-    }
+    this.checkUserDLC();
 
     if (localStorage.getItem('username') !== 'User' && localStorage.getItem('location_name') !== 'Location') {
       this.setState({
@@ -313,15 +319,28 @@ class App extends Component {
 
   toggle = e => this.setState(state => ({ index: state.index === 5 ? 0 : state.index + 1 }))
 
-  userBuyDLC(e, key) {
-    e.preventDefault();
-    console.log(e)
-    console.log(key)
-    let ref = `${this.state}` + `${key}`
-    console.log(ref)
+
+  getDLC(value) {
+    localStorage.setItem(value, 'unlocked')
+  }
+
+  showDlcOptions() {
     this.setState({
-      [`${key}`]: true
-    });
+      dlcView: true,
+      bareView: false,
+      ExtendedView: false,
+      DailyForecast: false,
+      WeeklyForecast: false,
+      ExtensiveWeather: false,
+      ClassyAudio: false,
+    })
+  }
+
+  hideDlcOptions() {
+    this.setState({
+      dlcView: false,
+    })
+    this.checkUserDLC();
   }
 
   render() {
@@ -431,10 +450,12 @@ class App extends Component {
               {
                 let textOpacity = '0.5';
                 let buyOrNah = true;
-                let findState = `${this.state + key.state_ref}`
-                if (findState === true) {
+                if (localStorage.getItem(`${key.state_ref}`) === "unlocked") {
                   textOpacity = '1'
                   buyOrNah = false
+                } 
+                else {
+                  console.log('ran else')
                 }
                 return (
                   <div key={index}>
@@ -445,21 +466,17 @@ class App extends Component {
                     <H2f style={{opacity: textOpacity}}>{key.title}</H2f>
                     <LineHR/>
                     {buyOrNah ?
-                    
-                    <H3f onClick={(e) => 
-                      this.userBuyDLC(e, key.state_ref)
-
-                      // this.setState({
-                      //   [`${key.state_ref}`]: true
-                      // });
-                    
-                    }> Unlock now for ${key.cost}/month</H3f>
-                    : <H3f>Thank you for your purchase</H3f>}
+                    <H3f><button value={key.state_ref} onClick={(evt) => this.getDLC(evt.target.value)}>
+                      Unlock now for ${key.cost}/month</button>
+                    </H3f>
+                    :
+                    <H3f>Thank you for your purchase</H3f>}
                   </div>
                 )
               }
             )
           }
+          <DclButton onClick={() => this.hideDlcOptions()}>Go back to the Weather</DclButton>
           </section>
         </DlcViewContainer>
       )
@@ -652,7 +669,7 @@ class App extends Component {
           {DlcView}
           {bareView}
           {ExtendedView}
-          <DclButton>Expansion Packs</DclButton>
+          {bareView ? <DclButton onClick={() => this.showDlcOptions()}>Expansion Packs</DclButton> : null}
           {DailyForecast}
           {WeeklyForecast}
           {ExtensiveWeather}
@@ -745,6 +762,17 @@ const DlcViewContainer = styled.div`
       margin-bottom: 96px;
       h2 {
         margin: 24px auto;
+      }
+      h3 {
+        position: relative;
+        width: 100%;
+        input {
+          position: absolute;
+        }
+        button {
+          background-color: transparent;
+          color: ${colors.gold};
+        }
       }
 
     }
