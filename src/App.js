@@ -1,7 +1,3 @@
-
-
-import { CONFIG_DARK_SKY, MAPBOX_CONFIG } from './config/env';
-
 // packages
 import React, { Component } from 'react';
 import axios from 'axios';
@@ -16,12 +12,16 @@ import { colors, fonts } from './config/_variables';
 import placeholder from './config/placeholder_weather'
 import { dayOfWeek, getTheMonth, dateInMonth, TwentyFourToTwleve } from './config/date_data'
 
-// global variables
-const apiKey = CONFIG_DARK_SKY.API_KEY;
-const darkSkyUrl = "https://api.darksky.net/forecast/";
 
+// global variables
+const apiKey = process.env.REACT_APP_CONFIG_DARK_SKY;
+const darkSkyUrl = "https://api.darksky.net/forecast/";
+console.log(apiKey)
+
+const mapboxKey = process.env.REACT_APP_MAPBOX_CONFIG;
+console.log(mapboxKey);
 const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
-const geocodingClient = mbxGeocoding({ accessToken: MAPBOX_CONFIG.KEY });
+const geocodingClient = mbxGeocoding({ accessToken: mapboxKey });
 
 class App extends Component {
   constructor(props) {

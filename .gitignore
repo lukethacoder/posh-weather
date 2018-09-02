@@ -58,3 +58,4 @@ typings/
 .env
 src/*.css
 src/config/env.js
+*.development
