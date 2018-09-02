@@ -21,7 +21,7 @@ const FooterContainer = styled.footer`
     margin: 0;
     padding: 0;
     font-family: ${fonts.sans};
-    position: absolute;
+    position: relative;
     bottom: 0;
     left: 0;
     ul {

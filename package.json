@@ -2,6 +2,7 @@
   "name": "posh-weather",
   "version": "0.1.0",
   "private": true,
+  "description": "HTTPS=true npm run start",
   "dependencies": {
     "@mapbox/mapbox-sdk": "^0.4.1",
     "axios": "^0.18.0",
@@ -21,7 +22,6 @@
     "build-css": "node-sass-chokidar --include-path ./src/App.scss --include-path ./node_modules src/App.scss -o",
     "watch-css": "npm run build-css && node-sass-chokidar --include-path ./src --include-path ./node_modules src/ -o src/ --watch --recursive",
     "start-js": "react-scripts start",
-    "https": "HTTPS=true npm run start",
     "start": "npm-run-all start-js",
     "build-js": "react-scripts build",
     "build": "npm-run-all build-css build-js",
