@@ -16,10 +16,8 @@ import { dayOfWeek, getTheMonth, dateInMonth, TwentyFourToTwleve } from './confi
 // global variables
 const apiKey = process.env.REACT_APP_CONFIG_DARK_SKY;
 const darkSkyUrl = "https://api.darksky.net/forecast/";
-console.log(apiKey)
 
 const mapboxKey = process.env.REACT_APP_MAPBOX_CONFIG;
-console.log(mapboxKey);
 const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
 const geocodingClient = mbxGeocoding({ accessToken: mapboxKey });
 
