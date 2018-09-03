@@ -2,11 +2,11 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
-import { Transition, animated, Spring } from 'react-spring'
+import { Transition, animated, Spring, config } from 'react-spring'
 
 // components
 import Loading from './components/loading';
-import Footer from './components/footer';
+// import Footer from './components/footer';
 import logo from './images/posh_weather.svg';
 import { colors, fonts } from './config/_variables';
 import placeholder from './config/placeholder_weather'
@@ -40,6 +40,7 @@ class App extends Component {
       ClassyAudio: false,
       dlcView: false,
     }
+
   }
 
   checkUserDLC() {
@@ -69,9 +70,13 @@ class App extends Component {
         ClassyAudio: true
       });
     }
-    if (this.state.ExtendedView === false) {
+    if (this.state.ExtendedView === null) {
       this.setState({
         bareView: true
+      })
+    } else {
+      this.setState({
+        bareView: false
       })
     }
     console.log('checked localStorage');
@@ -113,12 +118,11 @@ class App extends Component {
   })
   .send()
   .then(response => {
-    const match = response.body;
-    this.setState({
-      renderSearchOptions: response.body.features
-    });
-    console.log('​App -> getUserLocation -> match', match);
-
+    if (this.state.renderSearchOptions !== response.body.features) {
+      this.setState({
+        renderSearchOptions: response.body.features
+      });
+    }
   });
 
   }
@@ -140,7 +144,7 @@ class App extends Component {
       // this.getUserLocation(this.state.renderSearchOptions);
       localStorage.setItem('location_lon', this.state.renderSearchOptions[0].geometry.coordinates[0])
       localStorage.setItem('location_lat', this.state.renderSearchOptions[0].geometry.coordinates[1])
-      localStorage.setItem('location_name', this.state.renderSearchOptions[0].place_name)
+      localStorage.setItem('location_name', this.state.renderSearchOptions[0].text)
     }
 
     let lon = localStorage.getItem('location_lon');
@@ -320,6 +324,7 @@ class App extends Component {
 
   getDLC(value) {
     localStorage.setItem(value, 'unlocked')
+    this.checkUserDLC();
   }
 
   showDlcOptions() {
@@ -341,6 +346,12 @@ class App extends Component {
     this.checkUserDLC();
   }
 
+  handleRemoveDLC() {
+    localStorage.clear();
+    this.checkUserDLC();
+    this.forceUpdate();
+  }
+
   render() {
 
     const { renderSearchOptions } = this.state;
@@ -349,49 +360,53 @@ class App extends Component {
     const pages = [
       style => <animated.div key="1" style={{ ...style}}>
           <SlideItem>
-              <SerifText>Welcome to Posh Weather. <br/>
-              We believe in giving you the best weather experience money can buy</SerifText>
+            <DlcButton onClick={this.toggle}>Next</DlcButton>
+            <SerifText>Welcome to Posh Weather. <br/>
+            We believe in giving you the best weather experience money can buy</SerifText>
           </SlideItem>
       </animated.div>,
       style => <animated.div key="2" style={{ ...style}}>
           <SlideItem>
-              <SerifText>Jolly good to make your acquaintance. <br/>What may your name be?</SerifText>
-              <input id="name" type="text" required
-                  onChange={(evt) => { console.log(evt.target.value); localStorage.setItem('username', evt.target.value);}}
-              />
+            <DlcButton onClick={this.toggle}>Next</DlcButton>
+            <SerifText>Jolly good to make your acquaintance. <br/>What may your name be?</SerifText>
+            <input id="name" type="text" required
+                onChange={(evt) => { localStorage.setItem('username', evt.target.value);}}
+            />
           </SlideItem>
       </animated.div>,
       style => <animated.div key="3" style={{ ...style}}>
           <SlideItem>
-              <SerifText>Where are you right now?</SerifText>
-              {/* <input id="location" type="text" required
-                  onChange={(evt) => {this.forceUpdate(); this.getUserLocation(evt.target.value);}}
-              /> */}
-              <input id="location" type="text" required
-                  onChange={(evt) => {this.forceUpdate(); this.getUserLocation(evt.target.value);}}
-              />
-              {
-                renderSearchOptions.map(key =>
-                  <Spring
-                    from={{opacity: 0, paddingTop: "-100px"}} to={{opacity: 1, paddingTop: "0px" }}
-                  >
-                    {styles =>
-                      <li style={styles} key={key.id}
-                        onClick={() => {
-                          this.toggle();
-                          localStorage.setItem('location_lon', key.geometry.coordinates[0]);
-                          localStorage.setItem('location_lat', key.geometry.coordinates[1]);
-                          localStorage.setItem('location_name', key.place_name);
-                        }}
-                      >{key.place_name}</li>
-                    }
-                  </Spring>
-                )
-              }
+            <DlcButton onClick={this.toggle}>Next</DlcButton>
+            <SerifText>Where are you right now?</SerifText>
+            <input id="location" type="text" required
+                onChange={(evt) => {this.getUserLocation(evt.target.value);}}
+            />
+            {
+              renderSearchOptions.map(key =>
+                <Spring
+                  from={{opacity: 0, paddingTop: "-200px"}}
+                  to={{opacity: 1, paddingTop: "0px" }}
+                  config={{tension: 250, friction: 60}}
+                  keys={key.id}
+                >
+                  {styles =>
+                    <li style={styles} key={key.id}
+                      onClick={() => {
+                        this.toggle();
+                        localStorage.setItem('location_lon', key.geometry.coordinates[0]);
+                        localStorage.setItem('location_lat', key.geometry.coordinates[1]);
+                        localStorage.setItem('location_name', key.text);
+                      }}
+                    >{key.place_name}</li>
+                  }
+                </Spring>
+              )
+            }
           </SlideItem>
       </animated.div>,
       style => <animated.div key="4" style={{ ...style}}>
         <SlideItem>
+            <DlcButton onClick={this.toggle}>Next</DlcButton>
             <SerifText>We hope you enjoy your experience</SerifText>
         </SlideItem>
     </animated.div>
@@ -474,7 +489,7 @@ class App extends Component {
               }
             )
           }
-          <DclButton onClick={() => this.hideDlcOptions()}>Go back to the Weather</DclButton>
+          <DlcButton onClick={() => this.hideDlcOptions()}>Go back to the Weather</DlcButton>
           </section>
         </DlcViewContainer>
       )
@@ -642,7 +657,6 @@ class App extends Component {
                       {pages[this.state.index]}
                   </Transition>
               </SlideItem>
-              <button onClick={this.toggle}>Next</button>
           </WelcomeContainer>
         </WelcomeSliderContainer>
       )
@@ -667,14 +681,21 @@ class App extends Component {
           {DlcView}
           {bareView}
           {ExtendedView}
-          {bareView ? <DclButton onClick={() => this.showDlcOptions()}>Expansion Packs</DclButton> : null}
+          {DlcView ? null : <DlcButton onClick={() => this.showDlcOptions()}>Expansion Packs</DlcButton>}
           {DailyForecast}
           {WeeklyForecast}
           {ExtensiveWeather}
           {ClassyAudio}
           {welcomeSlider}
         </MainContentContainer>
-        <Footer/>
+        <FooterContainer classname="loading-component">
+            <ul>
+                <li>Built by <a href="https://lukesecomb.digital">Luke Secomb</a></li>
+                {/* <li onClick={() => this.removeLocalDLC()}>reset Weather Expansion Data</li> */}
+                <li onClick={() => this.handleRemoveDLC()}>reset Weather Expansion Data</li>
+                <li>Powered by <a href="https://darksky.net/poweredby/" rel="nofollow noreferrer">Dark Sky</a></li>
+            </ul>
+        </FooterContainer>
       </AppContainer>
     );
   }
@@ -682,7 +703,7 @@ class App extends Component {
 
 export default App;
 
-const DclButton = styled.button`
+const DlcButton = styled.button`
   cursor: pointer;
   margin: 0 auto 48px auto;
   display: block;
@@ -691,6 +712,9 @@ const DclButton = styled.button`
   padding: 8px 16px;
   background-color: transparent;
   color: ${colors.gold};
+  &:hover {
+    background-color: ${colors.gold} 50%;
+  }
 `
 const CurrentWeather = styled.h1`
   font-family: serif;
@@ -1054,14 +1078,14 @@ const WelcomeContainer = styled.div`
         position: absolute;
         top: 0;
     }
-    button {
-        position: absolute;
-        bottom: 20%;
-        /* right: 20%; */
-        width: auto;
-        padding: 0;
-        font-size: 1rem;
-    }
+    // button {
+    //     position: absolute;
+    //     bottom: 20%;
+    //     /* right: 20%; */
+    //     width: auto;
+    //     padding: 0;
+    //     font-size: 1rem;
+    // }
 `
 
 const SlideItem = styled.div`
@@ -1078,6 +1102,64 @@ const SlideItem = styled.div`
             text-align: left;
             color: ${colors.lightGrey};
             font-size: 2.25rem;
+        }
+        button {
+          position: absolute;
+          top: -4%;
+          /* right: 20%; */
+          width: auto;
+          // padding: 0;
+          font-size: 1rem;
+        }
+    }
+`
+
+const FooterContainer = styled.footer`
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: ${fonts.sans};
+    position: relative;
+    bottom: 0;
+    left: 0;
+    ul {
+        list-style-type: none;
+        padding: 24px 48px;
+        margin: 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        /* justify-content: center; */
+        opacity: .5;
+        transition: .5s;
+        &:hover {
+            opacity: 1;
+            transition: .5s;
+        }
+        li {
+            color: ${colors.white};
+            font-size: .75rem;
+            &:nth-of-type(2) {
+                cursor: pointer;
+            }
+            a {
+                color: ${colors.gold};
+                text-decoration: none;
+                transition: .5s;
+                opacity: 1;
+                &:hover {
+                    opacity: .5;
+                    transition: .5s;
+                }
+            }
+            &:nth-child(1) {
+                text-align: left;
+            }
+            &:nth-child(2) {
+                text-align: center;
+            }
+            &:nth-child(3) {
+                text-align: right;
+            }
         }
     }
 `
