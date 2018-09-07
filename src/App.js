@@ -2,11 +2,11 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
-import { Transition, animated, Spring } from 'react-spring'
+import { Transition, animated, Spring, config } from 'react-spring'
 
 // components
 import Loading from './components/loading';
-import Footer from './components/footer';
+// import Footer from './components/footer';
 import logo from './images/posh_weather.svg';
 import { colors, fonts } from './config/_variables';
 import placeholder from './config/placeholder_weather'
@@ -41,6 +41,7 @@ class App extends Component {
       ClassyAudio: false,
       dlcView: false,
     }
+
   }
 
   checkUserDLC() {
@@ -114,12 +115,11 @@ class App extends Component {
   })
   .send()
   .then(response => {
-    const match = response.body;
-    this.setState({
-      renderSearchOptions: response.body.features
-    });
-    console.log('​App -> getUserLocation -> match', match);
-
+    if (this.state.renderSearchOptions !== response.body.features) {
+      this.setState({
+        renderSearchOptions: response.body.features
+      });
+    }
   });
 
   }
@@ -343,6 +343,12 @@ class App extends Component {
     this.checkUserDLC();
   }
 
+  handleRemoveDLC() {
+    localStorage.clear();
+    this.checkUserDLC();
+    this.forceUpdate();
+  }
+
   render() {
 
     const { renderSearchOptions } = this.state;
@@ -351,16 +357,18 @@ class App extends Component {
     const pages = [
       style => <animated.div key="1" style={{ ...style}}>
           <SlideItem>
-              <SerifText>Welcome to Posh Weather. <br/>
-              We believe in giving you the best weather experience money can buy</SerifText>
+            <DlcButton onClick={this.toggle}>Next</DlcButton>
+            <SerifText>Welcome to Posh Weather. <br/>
+            We believe in giving you the best weather experience money can buy</SerifText>
           </SlideItem>
       </animated.div>,
       style => <animated.div key="2" style={{ ...style}}>
           <SlideItem>
-              <SerifText>Jolly good to make your acquaintance. <br/>What may your name be?</SerifText>
-              <input id="name" type="text" required
-                  onChange={(evt) => { console.log(evt.target.value); localStorage.setItem('username', evt.target.value);}}
-              />
+            <DlcButton onClick={this.toggle}>Next</DlcButton>
+            <SerifText>Jolly good to make your acquaintance. <br/>What may your name be?</SerifText>
+            <input id="name" type="text" required
+                onChange={(evt) => { localStorage.setItem('username', evt.target.value);}}
+            />
           </SlideItem>
       </animated.div>,
       style => <animated.div key="3" style={{ ...style}}>
@@ -394,6 +402,7 @@ class App extends Component {
       </animated.div>,
       style => <animated.div key="4" style={{ ...style}}>
         <SlideItem>
+            <DlcButton onClick={this.toggle}>Next</DlcButton>
             <SerifText>We hope you enjoy your experience</SerifText>
         </SlideItem>
     </animated.div>
@@ -682,7 +691,14 @@ class App extends Component {
           {ClassyAudio}
           {welcomeSlider}
         </MainContentContainer>
-        <Footer/>
+        <FooterContainer classname="loading-component">
+            <ul>
+                <li>Built by <a href="https://lukesecomb.digital">Luke Secomb</a></li>
+                {/* <li onClick={() => this.removeLocalDLC()}>reset Weather Expansion Data</li> */}
+                <li onClick={() => this.handleRemoveDLC()}>reset Weather Expansion Data</li>
+                <li>Powered by <a href="https://darksky.net/poweredby/" rel="nofollow noreferrer">Dark Sky</a></li>
+            </ul>
+        </FooterContainer>
       </AppContainer>
     );
   }
@@ -1091,6 +1107,64 @@ const SlideItem = styled.div`
             text-align: left;
             color: ${colors.lightGrey};
             font-size: 2.25rem;
+        }
+        button {
+          position: absolute;
+          top: -4%;
+          /* right: 20%; */
+          width: auto;
+          // padding: 0;
+          font-size: 1rem;
+        }
+    }
+`
+
+const FooterContainer = styled.footer`
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: ${fonts.sans};
+    position: relative;
+    bottom: 0;
+    left: 0;
+    ul {
+        list-style-type: none;
+        padding: 24px 48px;
+        margin: 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        /* justify-content: center; */
+        opacity: .5;
+        transition: .5s;
+        &:hover {
+            opacity: 1;
+            transition: .5s;
+        }
+        li {
+            color: ${colors.white};
+            font-size: .75rem;
+            &:nth-of-type(2) {
+                cursor: pointer;
+            }
+            a {
+                color: ${colors.gold};
+                text-decoration: none;
+                transition: .5s;
+                opacity: 1;
+                &:hover {
+                    opacity: .5;
+                    transition: .5s;
+                }
+            }
+            &:nth-child(1) {
+                text-align: left;
+            }
+            &:nth-child(2) {
+                text-align: center;
+            }
+            &:nth-child(3) {
+                text-align: right;
+            }
         }
     }
 `
