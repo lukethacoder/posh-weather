@@ -28,6 +28,7 @@ class App extends Component {
     this.state = {
       loading: false,
       index: 0,
+      DLCbutton: false,
       allWeatherData: placeholder,
       geoCodeData: '',
       renderSearchOptions: [],
@@ -43,10 +44,15 @@ class App extends Component {
   }
 
   checkUserDLC() {
-    if (localStorage.getItem('ExtendedView') !== null) {
+    if (localStorage.getItem('ExtendedView') === 'unlocked') {
       this.setState({
         ExtendedView: true,
         bareView: false
+      });
+    } else {
+      this.setState({
+        ExtendedView: false,
+        bareView: true
       });
     }
     if (localStorage.getItem('DailyForecast') !== null) {
@@ -68,11 +74,6 @@ class App extends Component {
       this.setState({
         ClassyAudio: true
       });
-    }
-    if (this.state.ExtendedView === false) {
-      this.setState({
-        bareView: true
-      })
     }
     console.log('checked localStorage');
   }
@@ -140,7 +141,7 @@ class App extends Component {
       // this.getUserLocation(this.state.renderSearchOptions);
       localStorage.setItem('location_lon', this.state.renderSearchOptions[0].geometry.coordinates[0])
       localStorage.setItem('location_lat', this.state.renderSearchOptions[0].geometry.coordinates[1])
-      localStorage.setItem('location_name', this.state.renderSearchOptions[0].place_name)
+      localStorage.setItem('location_name', this.state.renderSearchOptions[0].text)
     }
 
     let lon = localStorage.getItem('location_lon');
@@ -320,6 +321,7 @@ class App extends Component {
 
   getDLC(value) {
     localStorage.setItem(value, 'unlocked')
+    this.forceUpdate();
   }
 
   showDlcOptions() {
@@ -381,9 +383,9 @@ class App extends Component {
                           this.toggle();
                           localStorage.setItem('location_lon', key.geometry.coordinates[0]);
                           localStorage.setItem('location_lat', key.geometry.coordinates[1]);
-                          localStorage.setItem('location_name', key.place_name);
+                          localStorage.setItem('location_name', key.text);
                         }}
-                      >{key.place_name}</li>
+                      >{key.text}</li>
                     }
                   </Spring>
                 )
@@ -438,6 +440,8 @@ class App extends Component {
       },
     ]
 
+    
+
     if (this.state.dlcView === true) {
       DlcView = (
         <DlcViewContainer>
@@ -453,7 +457,7 @@ class App extends Component {
                   buyOrNah = false
                 } 
                 else {
-                  console.log('ran else')
+                  console.log('not unlocked')
                 }
                 return (
                   <div key={index}>
@@ -464,8 +468,9 @@ class App extends Component {
                     <H2f style={{opacity: textOpacity}}>{key.title}</H2f>
                     <LineHR/>
                     {buyOrNah ?
-                    <H3f><button value={key.state_ref} onClick={(evt) => this.getDLC(evt.target.value)}>
-                      Unlock now for ${key.cost}/month</button>
+                    // <H3f><button value={key.state_ref} onClick={(evt) => this.getDLC(evt.target.value)}>
+                    <H3f><DlcButton value={key.state_ref} onClick={(evt) => this.getDLC(evt.target.value)}>
+                      Unlock now for ${key.cost}/month</DlcButton>
                     </H3f>
                     :
                     <H3f>Thank you for your purchase</H3f>}
@@ -474,7 +479,7 @@ class App extends Component {
               }
             )
           }
-          <DclButton onClick={() => this.hideDlcOptions()}>Go back to the Weather</DclButton>
+          <DlcButton onClick={() => this.hideDlcOptions()}>Go back to the Weather</DlcButton>
           </section>
         </DlcViewContainer>
       )
@@ -486,11 +491,11 @@ class App extends Component {
         <ExtendedViewContaier>
           <LineHR/>
           <section>
-            <div class="side_view_left">
+            <div className="side_view_left">
               <H3f>Low</H3f>
               <H2f>{Math.round( this.state.allWeatherData.daily.data[0].temperatureLow * 10 / 10)}°</H2f>
             </div>
-            <div class="main_section">
+            <div className="main_section">
               <div>
                 <H3f>Currently</H3f>
                 <CurrentWeather>{Math.round( this.state.allWeatherData.currently.temperature * 10 / 10)}°</CurrentWeather>
@@ -642,7 +647,7 @@ class App extends Component {
                       {pages[this.state.index]}
                   </Transition>
               </SlideItem>
-              <button onClick={this.toggle}>Next</button>
+              <DlcButton onClick={this.toggle}>Next</DlcButton>
           </WelcomeContainer>
         </WelcomeSliderContainer>
       )
@@ -667,7 +672,10 @@ class App extends Component {
           {DlcView}
           {bareView}
           {ExtendedView}
-          {bareView ? <DclButton onClick={() => this.showDlcOptions()}>Expansion Packs</DclButton> : null}
+          {welcomeSlider ? null :
+            DlcView ? null : 
+              <DlcButton onClick={() => this.showDlcOptions()}>Expansion Packs</DlcButton>
+          }
           {DailyForecast}
           {WeeklyForecast}
           {ExtensiveWeather}
@@ -682,7 +690,7 @@ class App extends Component {
 
 export default App;
 
-const DclButton = styled.button`
+const DlcButton = styled.button`
   cursor: pointer;
   margin: 0 auto 48px auto;
   display: block;
@@ -691,6 +699,12 @@ const DclButton = styled.button`
   padding: 8px 16px;
   background-color: transparent;
   color: ${colors.gold};
+  transition: .25s;
+  &:hover {
+    background-color: ${colors.gold_sub};
+    padding: 8px 20px;
+    transition: .25s;
+  }
 `
 const CurrentWeather = styled.h1`
   font-family: serif;
@@ -1059,7 +1073,6 @@ const WelcomeContainer = styled.div`
         bottom: 20%;
         /* right: 20%; */
         width: auto;
-        padding: 0;
         font-size: 1rem;
     }
 `
