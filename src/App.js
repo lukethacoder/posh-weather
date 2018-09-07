@@ -345,8 +345,9 @@ class App extends Component {
 
   handleRemoveDLC() {
     localStorage.clear();
-    this.checkUserDLC();
-    this.forceUpdate();
+    this.setState({
+      index: 1
+    });
   }
 
   render() {
@@ -357,14 +358,12 @@ class App extends Component {
     const pages = [
       style => <animated.div key="1" style={{ ...style}}>
           <SlideItem>
-            <DlcButton onClick={this.toggle}>Next</DlcButton>
             <SerifText>Welcome to Posh Weather. <br/>
             We believe in giving you the best weather experience money can buy</SerifText>
           </SlideItem>
       </animated.div>,
       style => <animated.div key="2" style={{ ...style}}>
           <SlideItem>
-            <DlcButton onClick={this.toggle}>Next</DlcButton>
             <SerifText>Jolly good to make your acquaintance. <br/>What may your name be?</SerifText>
             <input id="name" type="text" required
                 onChange={(evt) => { localStorage.setItem('username', evt.target.value);}}
@@ -402,7 +401,6 @@ class App extends Component {
       </animated.div>,
       style => <animated.div key="4" style={{ ...style}}>
         <SlideItem>
-            <DlcButton onClick={this.toggle}>Next</DlcButton>
             <SerifText>We hope you enjoy your experience</SerifText>
         </SlideItem>
     </animated.div>
