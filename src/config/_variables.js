@@ -12,3 +12,10 @@ export const colors = {
     gradientGreyDark: '#0E0E0E',
     gradientGreyLight: '#181818'
 }
+
+export const view = {
+    mobile: '480px',
+    tablet: '690px',
+    desktop: '1079px',
+    highRes: '1439px'
+}

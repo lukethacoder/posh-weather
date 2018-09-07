@@ -2,13 +2,13 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
-import { Transition, animated, Spring, config } from 'react-spring'
+import { Transition, animated, Spring } from 'react-spring'
 
 // components
 import Loading from './components/loading';
 // import Footer from './components/footer';
 import logo from './images/posh_weather.svg';
-import { colors, fonts } from './config/_variables';
+import { colors, fonts, view } from './config/_variables';
 import placeholder from './config/placeholder_weather'
 import { dayOfWeek, getTheMonth, dateInMonth, TwentyFourToTwleve } from './config/date_data'
 
@@ -365,7 +365,7 @@ class App extends Component {
       style => <animated.div key="2" style={{ ...style}}>
           <SlideItem>
             <SerifText>Jolly good to make your acquaintance. <br/>What may your name be?</SerifText>
-            <input id="name" type="text" required
+            <UserInput id="name_of_user" type="text" autocomplete="no_today" required
                 onChange={(evt) => { localStorage.setItem('username', evt.target.value);}}
             />
           </SlideItem>
@@ -376,7 +376,7 @@ class App extends Component {
               {/* <input id="location" type="text" required
                   onChange={(evt) => {this.forceUpdate(); this.getUserLocation(evt.target.value);}}
               /> */}
-              <input id="location" type="text" required
+              <UserInput id="location" type="text" autocomplete="no_today" required
                   onChange={(evt) => {this.forceUpdate(); this.getUserLocation(evt.target.value);}}
               />
               {
@@ -385,14 +385,14 @@ class App extends Component {
                     from={{opacity: 0, paddingTop: "-100px"}} to={{opacity: 1, paddingTop: "0px" }}
                   >
                     {styles =>
-                      <li style={styles} key={key.id}
+                      <LocationOptions style={styles} key={key.id}
                         onClick={() => {
                           this.toggle();
                           localStorage.setItem('location_lon', key.geometry.coordinates[0]);
                           localStorage.setItem('location_lat', key.geometry.coordinates[1]);
                           localStorage.setItem('location_name', key.text);
                         }}
-                      >{key.text}</li>
+                      >{key.text}</LocationOptions>
                     }
                   </Spring>
                 )
@@ -610,6 +610,7 @@ class App extends Component {
       ClassyAudio = (
         <ClassyAudioContainer>
           <H2f>Posh Vibes</H2f>
+          <LineHR/>
           <div>
             <iframe
               title="spotify embed"
@@ -621,6 +622,7 @@ class App extends Component {
               allow="encrypted-media"
             ></iframe>
           </div>
+          <LineHR/>
         </ClassyAudioContainer>
       )
     }
@@ -664,7 +666,7 @@ class App extends Component {
 
     return (
       <AppContainer className="App">
-        <Spring delay={1000} from={{opacity: 0, paddingTop: "-100px"}} to={{opacity: 1, paddingTop: "0px" }}>
+        <Spring delay={1000} from={{opacity: 0, paddingTop: "-100px"}} to={{opacity: 1, paddingTop: "24px" }}>
           {styles =>
             <TopBar style={styles}>
               <p><span onClick={() => this.editUsername}>{localStorage.getItem('username')}</span> | <span onClick={() => this.editLocation}>{localStorage.getItem('location_name')}</span></p>
@@ -704,6 +706,21 @@ class App extends Component {
 
 export default App;
 
+const UserInput = styled.input`
+  color: ${colors.gold};
+  background-color: transparent;
+  border: 0px solid white;
+  border-bottom: 2px solid ${colors.gold};
+  font-size: 2.25rem;
+  width: 100%;
+  &:focus {
+    outline-color: -webkit-focus-ring-color;
+    outline-style: auto;
+    outline-width: 0;  
+    border-bottom: 1px solid ${colors.gold};
+  }
+`
+
 const DlcButton = styled.button`
   cursor: pointer;
   margin: 0 auto 48px auto;
@@ -719,17 +736,30 @@ const DlcButton = styled.button`
     padding: 8px 20px;
     transition: .25s;
   }
+  &:focus {
+    outline-color: -webkit-focus-ring-color;
+    outline-style: auto;
+    outline-width: 0;
+  }
 `
 const CurrentWeather = styled.h1`
   font-family: serif;
-  font-size: 7.5rem;
+  font-size: 5rem;
   color: ${colors.white};
+  @media (min-width: ${view.tablet}) {
+    font-size: 7.5rem;
+  }
 `
 const H2f = styled.h2`
-  font-size: 2.5rem;
+  font-size: 1.75rem;
   font-family: serif;
   color: ${colors.white};
   text-align: center;
+  width: 80%;
+  margin: 0 auto;
+  @media (min-width: ${view.tablet}) {
+    font-size: 2.5rem;
+  }
 `
 const H3f = styled.h3`
   font-family: sans-serif;
@@ -748,8 +778,11 @@ const SerifText = styled.p`
   color: ${colors.white};
 `
 const LineHR = styled.hr`
-  width: 50%;
+  width: 80%;
   border-color: ${colors.gold};
+  @media (min-width: ${view.desktop}) {
+    width: 50%;
+  }
 `
 const LineHR100 = styled.hr`
   width: 100%;
@@ -807,14 +840,21 @@ const DlcViewContainer = styled.div`
 
 const ClassyAudioContainer = styled.div`
   div {
-    width: 50%;
-    margin: 0 auto;
+    width: 80%;
+    margin: 24px auto;
+    @media (min-width: ${view.desktop}) {
+      width: 50%;
+    }
+
   }
 `
 
 const WeeklyForecastContainer = styled.div`
-  width: 50%;
+  width: 80%;
   margin: 0 auto;
+  @media (min-width: ${view.desktop}) {
+    width: 50%;
+  }
   > div {
     overflow-y: scroll;
     ::-webkit-scrollbar {
@@ -844,12 +884,15 @@ const WeeklyForecastContainer = styled.div`
         color: ${colors.white};
         li {
           min-width: 150px;
+          @media (min-width: ${view.desktop}) {
+            min-width: 150px;
+          } 
           h3 {
             margin: 0 auto 8px auto;
             align-self: flex-end;
           }
           h2 {
-            margin: 24px auto 24px 0;
+            margin: 24px auto;
           }
         }
       }
@@ -858,8 +901,11 @@ const WeeklyForecastContainer = styled.div`
 `
 
 const DailyForecastContainer = styled.div`
-  width: 50%;
+  width: 80%;
   margin: 0 auto;
+  @media (min-width: ${view.desktop}) {
+    width: 50%;
+  }
   > div {
     overflow-y: scroll;
     ::-webkit-scrollbar {
@@ -888,13 +934,16 @@ const DailyForecastContainer = styled.div`
         grid-template-rows: 1;
         color: ${colors.white};
         li {
-          min-width: 150px;
+          min-width: 120px;
+          @media (min-width: ${view.desktop}) {
+            min-width: 150px;
+          }
           h3 {
             margin: 0 auto 8px auto;
             align-self: flex-end;
           }
           h2 {
-            margin: 24px auto 24px 0;
+            margin: 24px auto;
           }
         }
       }
@@ -925,11 +974,14 @@ const ExtensiveWeatherContainer = styled.div`
 
 const ExtendedViewContaier = styled.div`
   section {
-    width: 50%;
+    width: 80%;
     margin: 0 auto;
     display: grid;
     grid-template-columns: 25% 50% 25%;
     /* side_view */
+    @media (min-width: ${view.desktop}) {
+      width: 50%;
+    }
     .main_section {
       display: grid;    
       grid-template-rows: 85% 1fr;
@@ -1002,15 +1054,37 @@ const TopBar = styled.div`
   width: 100%;
   height: auto;
   display: grid;
-  grid-template-columns: 50% 50%;
-  grid-auto-rows: 1fr;
+  grid-template-columns: 100%;
+  grid-auto-rows: 1fr 1fr;
+  padding: 24px 0;
+  @media (min-width: ${view.tablet}) {
+    grid-template-columns: 50% 50%;
+    grid-auto-rows: 1fr;
+    width: 100%;
+  }
+
   p {
     text-transform: uppercase;
     color: ${colors.gold};
     font-size: 1rem;
     padding: 1% 5%;
+    margin: 0;
+    text-align: center;
+    @media (min-width: ${view.tablet}) {
+      font-size: 1rem;
+      padding: 1% 5%;
+    }
+    &:nth-of-type(1) {
+      @media (min-width: ${view.tablet}) {
+        text-align: left;
+        align-self: flex-start;
+      }
+    }
     &:nth-of-type(2) {
-      text-align: right;
+      @media (min-width: ${view.tablet}) {
+        text-align: right;
+        align-self: flex-end;
+      }
     }
   }
 `
@@ -1049,11 +1123,16 @@ const MainContentContainer = styled.section`
 
 const Header = styled.header`
   width: 100%;
-  height: 12vh;
-  padding: 3% 0 4% 0;
+  height: 10vh;
+  padding: 3% 0 10% 0;
   color: ${colors.white};
   display: grid;
   justify-content: center;
+  @media (min-width: ${view.tablet}) {
+    width: 100%;
+    height: 12vh;
+    padding: 3% 0 4% 0;
+  }
   img {
     display: block;
     width: auto;
@@ -1062,13 +1141,40 @@ const Header = styled.header`
 `
 
 const WelcomeSliderContainer = styled.div`
-  width: 50%;
+  width: 90%;
   min-height: 250px;
   /* background-color: green; */
-  padding: 10% 25%;
+  padding: 125px 5% 10% 5%;
   position: relative;
   display: block;
+  @media (min-width: ${view.mobile}) {
+    width: 80%;
+    min-height: 250px;
+    padding: 20% 10% 10% 10%; 
+  }
+  @media (min-width: ${view.tablet}) {
+    width: 70%;
+    min-height: 250px;
+    padding: 15% 15% 10% 15%; 
+  }
+  @media (min-width: ${view.desktop}) {
+    width: 50%;
+    min-height: 250px;
+    padding: 10% 25% 10% 25%; 
+  }
 }
+`
+
+const LocationOptions = styled.li`
+  list-style-type: none;
+  font-size: 2.25rem;
+  color: ${colors.gold_sub};
+  transition: .5s;
+  cursor: pointer;
+  &:hover {
+    color: ${colors.gold};
+    transition: .5s;
+  }
 `
 
 const WelcomeContainer = styled.div`
@@ -1100,6 +1206,9 @@ const SlideItem = styled.div`
     justify-content: center;
     align-content: center;
     will-change: transform, opacity;
+    @media (min-width: ${view.desktop}) {
+      
+    }
     div {
         p {
             text-align: left;
