@@ -1,7 +1,7 @@
 export default {
   latitude: -35.4166879,
   longitude: 149.0651091,
-  timezone: "Australia/Sydney",
+  timezone: "placeholder",
   currently: {
     time: 1535862370,
     summary: "Partly Cloudy",

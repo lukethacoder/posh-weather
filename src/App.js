@@ -94,7 +94,12 @@ class App extends Component {
 
     if (localStorage.getItem('location_name') === null) {
       localStorage.setItem('location_name', 'Location');
+    } else {
+      console.log('about to get weather data');
+      // this.getAllWeatherData()
+      console.warn('did we get data? => ', this.state.allWeatherData);
     }
+
 
     // check user DLC 
     this.checkUserDLC();
@@ -154,17 +159,19 @@ class App extends Component {
           units: "auto"
         }
     }).then( (response) => {
-        if (response === "") {
+        if (response === this.state.allWeatherData) {
             alert('error creating timeline entry');
         }
-        this.setState(state => ({ index: state.index + 1, allWeatherData: response.data }));
-        console.log('​App -> getAllWeatherData -> this.state.allWeatherData', this.state.allWeatherData);
-    }).then((response) => {
-      if (response !== null || this.state.loading === true) {
         this.setState({
+          index: this.state.index + 1,
+          allWeatherData: response.data,
           loading: false
-        });
-      }
+        })
+        // this.setState({
+        //   allWeatherData: response,
+        //   loading: false
+        // });
+        console.log("this.state.allWeatherData => ", this.state.allWeatherData)
     });
     // getDarkSkyData.then((response) => this.setState({allWeatherData: response}));
   }
@@ -319,9 +326,11 @@ class App extends Component {
   toggle = e => this.setState(state => ({ index: state.index === 5 ? 0 : state.index + 1 }))
 
 
-  getDLC(value) {
+  getDLC(value, force) {
     localStorage.setItem(value, 'unlocked')
-    this.forceUpdate();
+    if (force !== null) {
+      this.forceUpdate();
+    }
   }
 
   showDlcOptions() {
@@ -377,11 +386,12 @@ class App extends Component {
                   onChange={(evt) => {this.forceUpdate(); this.getUserLocation(evt.target.value);}}
               /> */}
               <UserInput id="location" type="text" autocomplete="no_today" required
-                  onChange={(evt) => {this.forceUpdate(); this.getUserLocation(evt.target.value);}}
+                  // onChange={(evt) => {this.forceUpdate(); this.getUserLocation(evt.target.value);}}
+                  onChange={(evt) => {this.getUserLocation(evt.target.value);}}
               />
               {
                 renderSearchOptions.map(key =>
-                  <Spring
+                  <Spring key={key.id}
                     from={{opacity: 0, paddingTop: "-100px"}} to={{opacity: 1, paddingTop: "0px" }}
                   >
                     {styles =>
@@ -476,7 +486,7 @@ class App extends Component {
                     <LineHR/>
                     {buyOrNah ?
                     // <H3f><button value={key.state_ref} onClick={(evt) => this.getDLC(evt.target.value)}>
-                    <H3f><DlcButton value={key.state_ref} onClick={(evt) => this.getDLC(evt.target.value)}>
+                    <H3f><DlcButton value={key.state_ref} onClick={(evt) => this.getDLC(evt.target.value, 'force')}>
                       Unlock now for ${key.cost}/month</DlcButton>
                     </H3f>
                     :
@@ -494,6 +504,7 @@ class App extends Component {
 
     // Extended View (from base view)
     if (this.state.ExtendedView === true) {
+      this.getAllWeatherData();
       ExtendedView = (
         <ExtendedViewContaier>
           <LineHR/>
@@ -512,7 +523,7 @@ class App extends Component {
                 <H2f>{Math.round( this.state.allWeatherData.currently.apparentTemperature * 10 / 10)}°</H2f>
               </div>
             </div>
-            <div class="side_view_right">
+            <div className="side_view_right">
               <H3f>High</H3f>
               <H2f>{Math.round( this.state.allWeatherData.daily.data[0].temperatureHigh  * 10 / 10)}°</H2f>
             </div>
@@ -669,7 +680,7 @@ class App extends Component {
         <Spring delay={1000} from={{opacity: 0, paddingTop: "-100px"}} to={{opacity: 1, paddingTop: "24px" }}>
           {styles =>
             <TopBar style={styles}>
-              <p><span onClick={() => this.editUsername}>{localStorage.getItem('username')}</span> | <span onClick={() => this.editLocation}>{localStorage.getItem('location_name')}</span></p>
+              <p><span onClick={(evt) => this.editUsername(evt.target.value)}>{localStorage.getItem('username')}</span> | <span onClick={() => this.editLocation}>{localStorage.getItem('location_name')}</span></p>
               <p>{this.getTheDate()}</p>
             </TopBar>
           }
