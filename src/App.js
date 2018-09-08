@@ -492,7 +492,7 @@ class App extends Component {
 
     // Extended View (from base view)
     if (this.state.ExtendedView === true) {
-      // this.getAllWeatherData();
+      this.getAllWeatherData();
       ExtendedView = (
         <ExtendedViewContaier>
           <LineHR/>
@@ -627,7 +627,7 @@ class App extends Component {
     }
     // content if local Storage exists already (username + location)
     if (this.state.index >= 4 && this.state.bareView === true) {
-      // this.getAllWeatherData();
+      this.getAllWeatherData();
       bareView = (
         <BareViewContainer style={{color: 'white'}}>
           <LineHR/>
