@@ -85,7 +85,6 @@ class App extends Component {
       let LocalStorage = require('node-localstorage').LocalStorage;
       // eslint-disable-next-line
       localStorage = new LocalStorage('./scratch');
-      
     }
 
     if (localStorage.getItem('username') === null) {
@@ -155,11 +154,12 @@ class App extends Component {
         if (response === this.state.allWeatherData) {
             alert('error creating timeline entry');
         }
+        // let indVal = this.state.index;
         this.setState({
-          index: this.state.index + 1,
-          allWeatherData: response.data,
-          loading: false
-        })
+            index: this.state.index + 1,
+            allWeatherData: response.data,
+            loading: false
+        });
         // this.setState({
         //   allWeatherData: response,
         //   loading: false
@@ -492,7 +492,7 @@ class App extends Component {
 
     // Extended View (from base view)
     if (this.state.ExtendedView === true) {
-      this.getAllWeatherData();
+      // this.getAllWeatherData();
       ExtendedView = (
         <ExtendedViewContaier>
           <LineHR/>
@@ -627,7 +627,7 @@ class App extends Component {
     }
     // content if local Storage exists already (username + location)
     if (this.state.index >= 4 && this.state.bareView === true) {
-      this.getAllWeatherData();
+      // this.getAllWeatherData();
       bareView = (
         <BareViewContainer style={{color: 'white'}}>
           <LineHR/>
