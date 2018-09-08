@@ -16,6 +16,7 @@ import { dayOfWeek, getTheMonth, dateInMonth, TwentyFourToTwleve } from './confi
 // global variables
 const apiKey = process.env.REACT_APP_CONFIG_DARK_SKY;
 const darkSkyUrl = "https://api.darksky.net/forecast/";
+const herokuCORS = "https://cors-anywhere.herokuapp.com/";
 
 const mapboxKey = process.env.REACT_APP_MAPBOX_CONFIG;
 const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
@@ -154,7 +155,8 @@ class App extends Component {
 
     axios({
         method: 'GET',
-        url: darkSkyUrl + apiKey + "/" + lat + "," + lon +"",
+        url: herokuCORS + darkSkyUrl + apiKey + "/" + lat + "," + lon +"",
+        responseType: 'json',
         params: {
           units: "auto"
         }
