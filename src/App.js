@@ -77,7 +77,6 @@ class App extends Component {
         ClassyAudio: true
       });
     }
-    console.log('checked localStorage');
   }
 
   componentDidMount() {
@@ -95,12 +94,7 @@ class App extends Component {
 
     if (localStorage.getItem('location_name') === null) {
       localStorage.setItem('location_name', 'Location');
-    } else {
-      console.log('about to get weather data');
-      // this.getAllWeatherData()
-      console.warn('did we get data? => ', this.state.allWeatherData);
     }
-
 
     // check user DLC 
     this.checkUserDLC();
@@ -110,8 +104,6 @@ class App extends Component {
         index: 4
       });
     }
-
-    console.log('placeholder-weather data', this.state.allWeatherData);
   }
 
   getUserLocation(user_query) {
@@ -136,10 +128,9 @@ class App extends Component {
       })
     }
 
-    if (this.state.index !== 4) {
-      return console.log('you already got the data, stop running');
-    }
-    console.log("run getAllWeatherData()")
+    // if (this.state.index !== 4) {
+    //   return console.log('you already got the data, stop running');
+    // }
     if (localStorage.getItem('location_name') === null ||
         localStorage.getItem('location_lon') === null ||
         localStorage.getItem('location_lat') === null
@@ -173,9 +164,7 @@ class App extends Component {
         //   allWeatherData: response,
         //   loading: false
         // });
-        console.log("this.state.allWeatherData => ", this.state.allWeatherData)
     });
-    // getDarkSkyData.then((response) => this.setState({allWeatherData: response}));
   }
 
   getTheDate() {
@@ -474,9 +463,6 @@ class App extends Component {
                 if (localStorage.getItem(`${key.state_ref}`) === "unlocked") {
                   textOpacity = '1'
                   buyOrNah = false
-                } 
-                else {
-                  console.log('not unlocked')
                 }
                 return (
                   <div key={index}>
@@ -630,7 +616,7 @@ class App extends Component {
               src="https://open.spotify.com/embed/user/12162909955/playlist/1yeKPPV6xZ0ESc3zc4EVnY"
               width="100%"
               height="350"
-              frameborder="0"
+              frameBorder="0"
               allowtransparency="true"
               allow="encrypted-media"
             ></iframe>
@@ -641,7 +627,7 @@ class App extends Component {
     }
     // content if local Storage exists already (username + location)
     if (this.state.index >= 4 && this.state.bareView === true) {
-      // this.getAllWeatherData();
+      this.getAllWeatherData();
       bareView = (
         <BareViewContainer style={{color: 'white'}}>
           <LineHR/>
