@@ -365,6 +365,7 @@ class App extends Component {
     this.setState({
       index: 0
     });
+    alert("please refresh the page to reset data")
   }
 
   render() {
