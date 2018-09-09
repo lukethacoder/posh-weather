@@ -131,6 +131,7 @@ class App extends Component {
     if (this.state.index !== 4) {
       return console.log('you already got the data, stop running');
     }
+
     if (localStorage.getItem('location_name') === null ||
         localStorage.getItem('location_lon') === null ||
         localStorage.getItem('location_lat') === null
@@ -161,6 +162,8 @@ class App extends Component {
             loading: false
         });
     });
+
+    this.incrementIndexByOne();
   }
 
   incrementIndexByOne() {
@@ -495,7 +498,6 @@ class App extends Component {
     // Extended View (from base view)
     if (this.state.ExtendedView === true) {
       this.getAllWeatherData();
-      this.incrementIndexByOne();
       ExtendedView = (
         <ExtendedViewContaier>
           <LineHR/>
@@ -631,7 +633,6 @@ class App extends Component {
     // content if local Storage exists already (username + location)
     if (this.state.index >= 4 && this.state.bareView === true) {
       this.getAllWeatherData();
-      this.incrementIndexByOne();
       bareView = (
         <BareViewContainer style={{color: 'white'}}>
           <LineHR/>
