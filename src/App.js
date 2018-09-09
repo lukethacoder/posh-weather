@@ -122,14 +122,15 @@ class App extends Component {
   }
   getAllWeatherData() {
     if (this.state.allWeatherData === placeholder) {
+      console.warm('this is just placeholder data')
       this.setState({
         loading: true
       })
     }
 
-    // if (this.state.index !== 4) {
-    //   return console.log('you already got the data, stop running');
-    // }
+    if (this.state.index !== 4) {
+      return console.log('you already got the data, stop running');
+    }
     if (localStorage.getItem('location_name') === null ||
         localStorage.getItem('location_lon') === null ||
         localStorage.getItem('location_lat') === null
@@ -156,14 +157,15 @@ class App extends Component {
         }
         // let indVal = this.state.index;
         this.setState({
-            index: this.state.index + 1,
             allWeatherData: response.data,
             loading: false
         });
-        // this.setState({
-        //   allWeatherData: response,
-        //   loading: false
-        // });
+    });
+  }
+
+  incrementIndexByOne() {
+    this.setState({
+      index: this.state.index + 1
     });
   }
 
@@ -493,6 +495,7 @@ class App extends Component {
     // Extended View (from base view)
     if (this.state.ExtendedView === true) {
       this.getAllWeatherData();
+      this.incrementIndexByOne();
       ExtendedView = (
         <ExtendedViewContaier>
           <LineHR/>
@@ -628,6 +631,7 @@ class App extends Component {
     // content if local Storage exists already (username + location)
     if (this.state.index >= 4 && this.state.bareView === true) {
       this.getAllWeatherData();
+      this.incrementIndexByOne();
       bareView = (
         <BareViewContainer style={{color: 'white'}}>
           <LineHR/>
