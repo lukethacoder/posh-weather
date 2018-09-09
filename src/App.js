@@ -186,7 +186,7 @@ class App extends Component {
 
   getTheDate() {
     let today = new Date();
-    let returnTime = dayOfWeek[today.getDay()] + ' ' + dateInMonth[today.getDate()] + ' of ' + getTheMonth[today.getMonth()]; 
+    let returnTime = dayOfWeek[today.getDay()] + ' ' + dateInMonth[today.getDate() - 1] + ' of ' + getTheMonth[today.getMonth()]; 
     return returnTime
   }
 
@@ -1003,7 +1003,7 @@ const ExtendedViewContaier = styled.div`
     }
     .main_section {
       display: grid;    
-      grid-template-rows: 85% 1fr;
+      /* grid-template-rows: 85% 1fr; */
       grid-template-columns: 100%;
       > div {
         display: grid;
@@ -1146,14 +1146,14 @@ const Header = styled.header`
   padding: 3% 0 10% 0;
   color: ${colors.white};
   display: grid;
-  justify-content: center;
+  /* justify-content: center; */
   @media (min-width: ${view.tablet}) {
     width: 100%;
     height: 12vh;
     padding: 3% 0 4% 0;
   }
   img {
-    display: block;
+    justify-content: center;
     width: auto;
     height: 100%;
     margin: 0 auto;
