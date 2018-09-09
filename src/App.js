@@ -122,7 +122,7 @@ class App extends Component {
   }
   getAllWeatherData() {
     if (this.state.allWeatherData === placeholder) {
-      console.warm('this is just placeholder data')
+      console.warn('this is just placeholder data')
       this.setState({
         loading: true
       })
