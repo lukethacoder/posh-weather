@@ -363,12 +363,14 @@ class App extends Component {
     const pages = [
       style => <animated.div key="1" style={{ ...style}}>
           <SlideItem>
+            <DlcButton onClick={this.toggle}>Next</DlcButton>
             <SerifText>Welcome to Posh Weather. <br/>
             We believe in giving you the best weather experience money can buy</SerifText>
           </SlideItem>
       </animated.div>,
       style => <animated.div key="2" style={{ ...style}}>
           <SlideItem>
+            <DlcButton onClick={this.toggle}>Next</DlcButton>
             <SerifText>Jolly good to make your acquaintance. <br/>What may your name be?</SerifText>
             <UserInput id="name_of_user" type="text" autocomplete="no_today" required
                 onChange={(evt) => { localStorage.setItem('username', evt.target.value);}}
@@ -377,6 +379,7 @@ class App extends Component {
       </animated.div>,
       style => <animated.div key="3" style={{ ...style}}>
           <SlideItem>
+            <DlcButton onClick={this.toggle}>Next</DlcButton>
               <SerifText>Where are you right now?</SerifText>
               {/* <input id="location" type="text" required
                   onChange={(evt) => {this.forceUpdate(); this.getUserLocation(evt.target.value);}}
@@ -407,6 +410,7 @@ class App extends Component {
       </animated.div>,
       style => <animated.div key="4" style={{ ...style}}>
         <SlideItem>
+            <DlcButton onClick={this.toggle}>Next</DlcButton>
             <SerifText>We hope you enjoy your experience</SerifText>
         </SlideItem>
     </animated.div>
@@ -522,6 +526,7 @@ class App extends Component {
             </div>
           </section>
           <LineHR/>
+          <DlcButton style={{marginTop: "36px"}} onClick={() => this.showDlcOptions()}>Expansion Packs</DlcButton>
         </ExtendedViewContaier>
       )
     }
@@ -641,12 +646,14 @@ class App extends Component {
                 <CurrentWeather style={{textAlign: "center"}}>{Math.round( this.state.allWeatherData.currently.temperature * 10 / 10)}°</CurrentWeather>
               </div>
           <LineHR/>
+          <DlcButton style={{marginTop: "36px"}} onClick={() => this.showDlcOptions()}>Expansion Packs</DlcButton>
+
         </BareViewContainer>
       )
     }
 
     // welcome slider
-    if (this.state.index !== 4) {
+    if (this.state.index !== 5) {
       welcomeSlider = (
         <WelcomeSliderContainer>
           <WelcomeContainer>
@@ -660,10 +667,9 @@ class App extends Component {
                       {pages[this.state.index]}
                   </Transition>
               </SlideItem>
-              <DlcButton onClick={this.toggle}>Next</DlcButton>
           </WelcomeContainer>
         </WelcomeSliderContainer>
-      )
+      );
     } else {
       welcomeSlider = null;
     }
@@ -685,10 +691,6 @@ class App extends Component {
           {DlcView}
           {bareView}
           {ExtendedView}
-          {welcomeSlider ? null :
-            DlcView ? null : 
-              <DlcButton onClick={() => this.showDlcOptions()}>Expansion Packs</DlcButton>
-          }
           {DailyForecast}
           {WeeklyForecast}
           {ExtensiveWeather}
