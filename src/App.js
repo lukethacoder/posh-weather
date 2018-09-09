@@ -132,14 +132,26 @@ class App extends Component {
       return console.log('you already got the data, stop running');
     }
 
+    // set placeholder values for empty location input
+    let lonBefore = 149.0875;
+    let latBefore = -35.238888888889;
+    let locationNameBefore = "University of Canberra";
+
+    // check if user entered location co-ordinates + change place holder values if they did
+    if (this.state.renderSearchOptions[0] !== undefined) {
+      lonBefore = this.state.renderSearchOptions[0].geometry.coordinates[0];
+      latBefore = this.state.renderSearchOptions[0].geometry.coordinates[1]
+      locationNameBefore = this.state.renderSearchOptions[0].text;
+    }
+
+    // check if local storage data exits
     if (localStorage.getItem('location_name') === null ||
         localStorage.getItem('location_lon') === null ||
         localStorage.getItem('location_lat') === null
     ) {
-      // this.getUserLocation(this.state.renderSearchOptions);
-      localStorage.setItem('location_lon', this.state.renderSearchOptions[0].geometry.coordinates[0])
-      localStorage.setItem('location_lat', this.state.renderSearchOptions[0].geometry.coordinates[1])
-      localStorage.setItem('location_name', this.state.renderSearchOptions[0].text)
+      localStorage.setItem('location_lon', lonBefore)
+      localStorage.setItem('location_lat', latBefore)
+      localStorage.setItem('location_name', locationNameBefore)
     }
 
     let lon = localStorage.getItem('location_lon');
@@ -351,7 +363,7 @@ class App extends Component {
   handleRemoveDLC() {
     localStorage.clear();
     this.setState({
-      index: 1
+      index: 0
     });
   }
 
@@ -1196,8 +1208,7 @@ const WelcomeContainer = styled.div`
     }
     button {
         position: absolute;
-        bottom: 20%;
-        /* right: 20%; */
+        top: -10%;
         width: auto;
         font-size: 1rem;
     }
@@ -1223,10 +1234,7 @@ const SlideItem = styled.div`
         }
         button {
           position: absolute;
-          top: -4%;
-          /* right: 20%; */
           width: auto;
-          // padding: 0;
           font-size: 1rem;
         }
     }
