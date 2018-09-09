@@ -1156,6 +1156,7 @@ const Header = styled.header`
     display: block;
     width: auto;
     height: 100%;
+    margin: 0 auto;
   }
 `
 
