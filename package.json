@@ -20,12 +20,12 @@
     "styled-components": "^3.4.2"
   },
   "scripts": {
-    "build-css": "node-sass-chokidar --include-path ./src/App.scss --include-path ./node_modules src/App.scss -o",
+    "build-css": "npm run node-sass-chokidar --include-path ./src --include-path ./node_modules src/ -o",
     "watch-css": "npm run build-css && node-sass-chokidar --include-path ./src --include-path ./node_modules src/ -o src/ --watch --recursive",
     "start-js": "react-scripts start",
     "start": "npm-run-all start-js",
     "build-js": "react-scripts build",
-    "build": "npm-run-all build-css build-js",
+    "build": "npm-run-all build-js",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   }
