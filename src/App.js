@@ -362,10 +362,11 @@ class App extends Component {
 
   handleRemoveDLC() {
     localStorage.clear();
+    window.location.reload();
     this.setState({
       index: 0
     });
-    alert("please refresh the page to reset data")
+    // alert("please refresh the page to reset data")
   }
 
   render() {
