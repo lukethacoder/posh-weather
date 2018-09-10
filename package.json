@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "HTTPS=true npm run start",
+  "homepage": "https://posh-weather.netlify.com",
   "dependencies": {
     "@mapbox/mapbox-sdk": "^0.4.1",
     "axios": "^0.18.0",
