@@ -899,7 +899,7 @@ const WeeklyForecastContainer = styled.div`
         padding: 0;
         margin: 24px 0;
         display: grid;
-        grid-template-columns: repeat(8, 1fr);
+        grid-template-columns: repeat(7, 1fr);
         grid-template-rows: 1;
         color: ${colors.white};
         li {
