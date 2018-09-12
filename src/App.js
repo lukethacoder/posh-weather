@@ -159,7 +159,7 @@ class App extends Component {
 
     axios({
         method: 'GET',
-        url: darkSkyUrl + apiKey + "/" + lat + "," + lon +"", // herokuCORS
+        url: herokuCORS + darkSkyUrl + apiKey + "/" + lat + "," + lon +"", // herokuCORS
         responseType: 'json',
         params: {
           units: "auto"
