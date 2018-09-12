@@ -161,6 +161,7 @@ class App extends Component {
         method: 'GET',
         url: herokuCORS + darkSkyUrl + apiKey + "/" + lat + "," + lon +"", // herokuCORS
         responseType: 'json',
+        mode: 'no-cors',
         params: {
           units: "auto"
         }
