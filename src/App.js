@@ -12,7 +12,6 @@ import { colors, fonts, view } from './config/_variables';
 import placeholder from './config/placeholder_weather'
 import { dayOfWeek, getTheMonth, dateInMonth, TwentyFourToTwleve } from './config/date_data'
 
-
 // global variables
 const apiKey = process.env.REACT_APP_CONFIG_DARK_SKY;
 const darkSkyUrl = "https://api.darksky.net/forecast/";
@@ -42,7 +41,6 @@ class App extends Component {
       ClassyAudio: false,
       dlcView: false,
     }
-
   }
 
   checkUserDLC() {
@@ -128,10 +126,6 @@ class App extends Component {
       })
     }
 
-    if (this.state.index !== 4) {
-      return console.log('you already got the data, stop running');
-    }
-
     // set placeholder values for empty location input
     let lonBefore = 149.0875;
     let latBefore = -35.238888888889;
@@ -159,7 +153,7 @@ class App extends Component {
 
     axios({
         method: 'GET',
-        url: herokuCORS + darkSkyUrl + apiKey + "/" + lat + "," + lon +"", // herokuCORS
+        url: herokuCORS + darkSkyUrl + apiKey + "/" + lat + "," + lon +"",
         responseType: 'json',
         mode: 'no-cors',
         params: {
@@ -191,14 +185,6 @@ class App extends Component {
     return returnTime
   }
 
-  editUsername() {
-    console.log("coming soon")
-  }
-
-  editLocation() {
-    console.log("coming soon")
-  }
-
   degreesToDirection(num) {
       var val = Math.floor((num / 22.5) + 0.5);
       var arr = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
@@ -207,133 +193,118 @@ class App extends Component {
 
   // daily forecast functions
   mapDailyForecastTime(weather_data) {
-    let dailyForecast = weather_data.map((key, index) =>
-      {
-        // caps hours to 24hrs
-        if (index >= 24) {
-          return null
-        }
-        else {
-          return (
-            <li key={key.time}>
-              <H3f>{ TwentyFourToTwleve[new Date(new Date(key.time * 1000).toISOString()).getHours()] }</H3f>
-            </li>
-          )
-        }
+    let dailyForecast = weather_data.map((key, index) => {
+      // caps hours to 24hrs
+      if (index >= 24) {
+        return null
       }
-    )
+      else {
+        return (
+          <li key={key.time}>
+            <H3f>{ TwentyFourToTwleve[new Date(new Date(key.time * 1000).toISOString()).getHours()] }</H3f>
+          </li>
+        )
+      }
+    })
     return dailyForecast;
   }
 
   mapDailyForecastDay(weather_data) {
-    let dailyForecast = weather_data.map((key, index) =>
-      {
-        // caps hours to 24hrs
-        if (index >= 24) {
-          return null
-        }
-        else {
-          return (
-            <li key={key.time}>
-              <LineHR100/>
-              <H2f>{ Math.round(key.temperature * 1000 / 1000 ) }°</H2f>
-              <LineHR100/>
-            </li>
-          )
-        }
+    let dailyForecast = weather_data.map((key, index) => {
+      if (index >= 24) {
+        return null
       }
-    )
+      else {
+        return (
+          <li key={key.time}>
+            <LineHR100/>
+            <H2f>{ Math.round(key.temperature * 1000 / 1000 ) }°</H2f>
+            <LineHR100/>
+          </li>
+        )
+      }
+    })
     return dailyForecast;
   }
 
   mapDailyForecastPrecip(weather_data) {
-    let dailyForecast = weather_data.map((key, index) =>
-      {
-        // caps hours to 24hrs
-        if (index >= 24) {
-          return null
-        }
-        else {
-          let tempPercent = key.precipProbability * 100;
-          let dynamicGridTemplate = '1fr ' + (key.precipProbability * 60) + '%';
-          return (
-            <li key={key.time} style={{marginBottom: '8px'}}>
-              <GraphDiv style={{display: 'grid', gridTemplateRows: dynamicGridTemplate}}>
-                <H3f>{tempPercent}%</H3f>
-                <div/>
-              </GraphDiv>
-            </li>
-          )
-        }
+    let dailyForecast = weather_data.map((key, index) => {
+      if (index >= 24) {
+        return null
       }
-    )
+      else {
+        let tempPercent = key.precipProbability * 100;
+        let dynamicGridTemplate = '1fr ' + (key.precipProbability * 60) + '%';
+        return (
+          <li key={key.time} style={{marginBottom: '8px'}}>
+            <GraphDiv style={{display: 'grid', gridTemplateRows: dynamicGridTemplate}}>
+              <H3f>{tempPercent}%</H3f>
+              <div/>
+            </GraphDiv>
+          </li>
+        )
+      }
+    })
     return dailyForecast;
   }
 
   // weekly forecast functions
   mapWeeklyForecastTime(weather_data) {
-    let weeklyForecast = weather_data.map((key, index) =>
-      {
-        if (index === 0) {
-          return null
-        }
-        else {
-          return (
-            <li key={key.time}>
-              <H3f>{ dayOfWeek[new Date(new Date(key.time * 1000).toISOString()).getDay()] }</H3f>
-            </li>
-          )
-        }
+    let weeklyForecast = weather_data.map((key, index) => {
+      if (index === 0) {
+        return null
       }
-    )
+      else {
+        return (
+          <li key={key.time}>
+            <H3f>{ dayOfWeek[new Date(new Date(key.time * 1000).toISOString()).getDay()] }</H3f>
+          </li>
+        )
+      }
+    })
     return weeklyForecast;
   }
 
   mapWeeklyForecastDay(weather_data) {
-    let weeklyForecast = weather_data.map((key, index) =>
-      {
-        if (index === 0) {
-          return null
-        }
-        else {
-          return (
-            <li key={key.time}>
-              <LineHR100/>
-              <H2f>{ Math.round(key.temperatureLow * 100 / 100 ) }°/{ Math.round(key.temperatureHigh * 100 / 100 ) }°</H2f>
-              <LineHR100/>
-            </li>
-          )
-        }
+    let weeklyForecast = weather_data.map((key, index) => {
+      if (index === 0) {
+        return null
       }
-    )
+      else {
+        return (
+          <li key={key.time}>
+            <LineHR100/>
+            <H2f>{ Math.round(key.temperatureLow * 100 / 100 ) }°/{ Math.round(key.temperatureHigh * 100 / 100 ) }°</H2f>
+            <LineHR100/>
+          </li>
+        )
+      }
+    })
     return weeklyForecast;
   }
 
   mapWeeklyForecastPrecip(weather_data) {
-    let weeklyForecast = weather_data.map((key, index) =>
-      {
-        let tempPercent = Math.round(key.precipProbability * 1000 / 10);
-        let dynamicGridTemplate = '1fr ' + (key.precipProbability * 60) + '%';
-        if (index === 0) {
-          return null
-        }
-        else {
-          return (
-            <li key={key.time} style={{marginBottom: '8px'}}>
-              <GraphDiv style={{display: 'grid', gridTemplateRows: dynamicGridTemplate}}>
-                <H3f>{tempPercent}%</H3f>
-                <div/>
-              </GraphDiv>
-            </li>
-          )
-        }
+    let weeklyForecast = weather_data.map((key, index) => {
+      let tempPercent = Math.round(key.precipProbability * 1000 / 10);
+      let dynamicGridTemplate = '1fr ' + (key.precipProbability * 60) + '%';
+      if (index === 0) {
+        return null
       }
-    )
+      else {
+        return (
+          <li key={key.time} style={{marginBottom: '8px'}}>
+            <GraphDiv style={{display: 'grid', gridTemplateRows: dynamicGridTemplate}}>
+              <H3f>{tempPercent}%</H3f>
+              <div/>
+            </GraphDiv>
+          </li>
+        )
+      }
+    })
     return weeklyForecast;
   }
 
   toggle = e => this.setState(state => ({ index: state.index === 5 ? 0 : state.index + 1 }))
-
 
   getDLC(value, force) {
     localStorage.setItem(value, 'unlocked')
@@ -367,13 +338,10 @@ class App extends Component {
     this.setState({
       index: 0
     });
-    // alert("please refresh the page to reset data")
   }
 
   render() {
-
     const { renderSearchOptions } = this.state;
-
     // welcome slides (if no local storage data)
     const pages = [
       style => <animated.div key="1" style={{ ...style}}>
@@ -396,11 +364,7 @@ class App extends Component {
           <SlideItem>
             <DlcButton onClick={this.toggle}>Next</DlcButton>
               <SerifText>Where are you right now?</SerifText>
-              {/* <input id="location" type="text" required
-                  onChange={(evt) => {this.forceUpdate(); this.getUserLocation(evt.target.value);}}
-              /> */}
               <UserInput id="location" type="text" autocomplete="no_today" required
-                  // onChange={(evt) => {this.forceUpdate(); this.getUserLocation(evt.target.value);}}
                   onChange={(evt) => {this.getUserLocation(evt.target.value);}}
               />
               {
@@ -472,8 +436,6 @@ class App extends Component {
       },
     ]
 
-    
-
     if (this.state.dlcView === true) {
       DlcView = (
         <DlcViewContainer>
@@ -497,7 +459,6 @@ class App extends Component {
                     <H2f style={{opacity: textOpacity}}>{key.title}</H2f>
                     <LineHR/>
                     {buyOrNah ?
-                    // <H3f><button value={key.state_ref} onClick={(evt) => this.getDLC(evt.target.value)}>
                     <H3f><DlcButton value={key.state_ref} onClick={(evt) => this.getDLC(evt.target.value, 'force')}>
                       Unlock now for ${key.cost}/month</DlcButton>
                     </H3f>
@@ -560,7 +521,6 @@ class App extends Component {
                 {this.mapDailyForecastDay(this.state.allWeatherData.hourly.data)}
               </ul>
               <ul>
-                {/* map precipProbability */}
                 {this.mapDailyForecastPrecip(this.state.allWeatherData.hourly.data)}
               </ul>
             </section>
@@ -600,7 +560,6 @@ class App extends Component {
           <section>
             <div>
               <H3f>Wind</H3f>
-              {/* convert windBearing to letter bearings e.g. SW, NE */}
               <H5f>{this.degreesToDirection(this.state.allWeatherData.currently.windBearing)} {Math.round( this.state.allWeatherData.currently.windSpeed  * 10 / 10)} km/h</H5f>
             </div>
             <div>
@@ -662,7 +621,6 @@ class App extends Component {
               </div>
           <LineHR/>
           <DlcButton style={{marginTop: "36px"}} onClick={() => this.showDlcOptions()}>Expansion Packs</DlcButton>
-
         </BareViewContainer>
       )
     }
@@ -672,16 +630,16 @@ class App extends Component {
       welcomeSlider = (
         <WelcomeSliderContainer>
           <WelcomeContainer>
-              <SlideItem>
-                  <Transition
-                      native
-                      from={{ opacity: 0, transform: 'translate3d(200%,0,0)' }}
-                      enter={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
-                      leave={{ opacity: 0, transform: 'translate3d(0,0,0)' }}
-                  >
-                      {pages[this.state.index]}
-                  </Transition>
-              </SlideItem>
+            <SlideItem>
+              <Transition
+                native
+                from={{ opacity: 0, transform: 'translate3d(200%,0,0)' }}
+                enter={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
+                leave={{ opacity: 0, transform: 'translate3d(0,0,0)' }}
+              >
+                {pages[this.state.index]}
+              </Transition>
+            </SlideItem>
           </WelcomeContainer>
         </WelcomeSliderContainer>
       );
@@ -694,7 +652,7 @@ class App extends Component {
         <Spring delay={1000} from={{opacity: 0, paddingTop: "-100px"}} to={{opacity: 1, paddingTop: "24px" }}>
           {styles =>
             <TopBar style={styles}>
-              <p><span onClick={(evt) => this.editUsername(evt.target.value)}>{localStorage.getItem('username')}</span> | <span onClick={() => this.editLocation}>{localStorage.getItem('location_name')}</span></p>
+              <p><span>{localStorage.getItem('username')}</span> | <span>{localStorage.getItem('location_name')}</span></p>
               <p>{this.getTheDate()}</p>
             </TopBar>
           }
@@ -713,12 +671,11 @@ class App extends Component {
           {welcomeSlider}
         </MainContentContainer>
         <FooterContainer classname="loading-component">
-            <ul>
-                <li>Built by <a href="https://lukesecomb.digital">Luke Secomb</a></li>
-                {/* <li onClick={() => this.removeLocalDLC()}>reset Weather Expansion Data</li> */}
-                <li onClick={() => this.handleRemoveDLC()}>reset Weather Expansion Data</li>
-                <li>Powered by <a href="https://darksky.net/poweredby/" rel="nofollow noreferrer">Dark Sky</a></li>
-            </ul>
+          <ul>
+            <li>Built by <a href="https://lukesecomb.digital">Luke Secomb</a></li>
+            <li onClick={() => this.handleRemoveDLC()}>reset Weather Expansion Data</li>
+            <li>Powered by <a href="https://darksky.net/poweredby/" rel="nofollow noreferrer">Dark Sky</a></li>
+          </ul>
         </FooterContainer>
       </AppContainer>
     );
@@ -741,7 +698,6 @@ const UserInput = styled.input`
     border-bottom: 1px solid ${colors.gold};
   }
 `
-
 const DlcButton = styled.button`
   cursor: pointer;
   margin: 0 auto 48px auto;
@@ -832,7 +788,6 @@ const GraphDiv = styled.div`
     opacity: .5;
   }
 `
-
 const DlcViewContainer = styled.div`
   > h2 {
     margin-bottom: 48px;
@@ -858,7 +813,6 @@ const DlcViewContainer = styled.div`
     }
   }
 `
-
 const ClassyAudioContainer = styled.div`
   div {
     width: 80%;
@@ -866,10 +820,8 @@ const ClassyAudioContainer = styled.div`
     @media (min-width: ${view.desktop}) {
       width: 50%;
     }
-
   }
 `
-
 const WeeklyForecastContainer = styled.div`
   width: 80%;
   margin: 0 auto;
@@ -920,7 +872,6 @@ const WeeklyForecastContainer = styled.div`
     }
   }
 `
-
 const DailyForecastContainer = styled.div`
   width: 80%;
   margin: 0 auto;
@@ -972,7 +923,6 @@ const DailyForecastContainer = styled.div`
   }
   
 `
-
 const ExtensiveWeatherContainer = styled.div`
   section {
     margin: 48px auto;
@@ -992,20 +942,17 @@ const ExtensiveWeatherContainer = styled.div`
     }
   }
 `
-
 const ExtendedViewContaier = styled.div`
   section {
     width: 80%;
     margin: 0 auto;
     display: grid;
     grid-template-columns: 25% 50% 25%;
-    /* side_view */
     @media (min-width: ${view.desktop}) {
       width: 50%;
     }
     .main_section {
-      display: grid;    
-      /* grid-template-rows: 85% 1fr; */
+      display: grid;
       grid-template-columns: 100%;
       > div {
         display: grid;
@@ -1068,10 +1015,7 @@ const BareViewContainer = styled.div`
     }
   }
 `
-
 const TopBar = styled.div`
-  /* position: fixed; */
-  /* top: 0; */
   width: 100%;
   height: auto;
   display: grid;
@@ -1083,7 +1027,6 @@ const TopBar = styled.div`
     grid-auto-rows: 1fr;
     width: 100%;
   }
-
   p {
     text-transform: uppercase;
     color: ${colors.gold};
@@ -1109,14 +1052,12 @@ const TopBar = styled.div`
     }
   }
 `
-
 const AppContainer = styled.div`
   width: 100%;
   margin: 0;
   padding: 0;
   font-family: ${fonts.sans};
   min-height: 100vh;
-
   /* Gradients for dayz */
   background-color: ${colors.gradientGreyDark};
   background: ${colors.gradientGreyDark}k; /* Old browsers */
@@ -1125,7 +1066,6 @@ const AppContainer = styled.div`
   background: linear-gradient(to right, ${colors.gradientGreyDark} 0%, ${colors.gradientGreyLight} 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='${colors.gradientGreyDark}', endColorstr='${colors.gradientGreyLight}',GradientType=1 ); /* IE6-9 */
 `
-
 const MainContentContainer = styled.section`
   width: 100%;
   height: auto;
@@ -1141,14 +1081,12 @@ const MainContentContainer = styled.section`
     margin-bottom: 175px;
   }
 `
-
 const Header = styled.header`
   width: 100%;
   height: 10vh;
   padding: 3% 0 10% 0;
   color: ${colors.white};
   display: grid;
-  /* justify-content: center; */
   @media (min-width: ${view.tablet}) {
     width: 100%;
     height: 12vh;
@@ -1161,11 +1099,9 @@ const Header = styled.header`
     margin: 0 auto;
   }
 `
-
 const WelcomeSliderContainer = styled.div`
   width: 90%;
   min-height: 250px;
-  /* background-color: green; */
   padding: 125px 5% 10% 5%;
   position: relative;
   display: block;
@@ -1184,9 +1120,7 @@ const WelcomeSliderContainer = styled.div`
     min-height: 250px;
     padding: 10% 25% 10% 25%; 
   }
-}
 `
-
 const LocationOptions = styled.li`
   list-style-type: none;
   font-size: 2.25rem;
@@ -1198,7 +1132,6 @@ const LocationOptions = styled.li`
     transition: .5s;
   }
 `
-
 const WelcomeContainer = styled.div`
     position: relative;
     width: 100%;
@@ -1217,79 +1150,73 @@ const WelcomeContainer = styled.div`
         font-size: 1rem;
     }
 `
-
 const SlideItem = styled.div`
-    color: white;
-    position: absolute;
-    width: 100%;
-    height: 450px;
-    display: block;
-    justify-content: center;
-    align-content: center;
-    will-change: transform, opacity;
-    @media (min-width: ${view.desktop}) {
-      
+  color: white;
+  position: absolute;
+  width: 100%;
+  height: 450px;
+  display: block;
+  justify-content: center;
+  align-content: center;
+  will-change: transform, opacity;
+  div {
+    p {
+      text-align: left;
+      color: ${colors.lightGrey};
+      font-size: 2.25rem;
     }
-    div {
-        p {
-            text-align: left;
-            color: ${colors.lightGrey};
-            font-size: 2.25rem;
-        }
-        button {
-          position: absolute;
-          width: auto;
-          font-size: 1rem;
-        }
+    button {
+      position: absolute;
+      width: auto;
+      font-size: 1rem;
     }
+  }
 `
-
 const FooterContainer = styled.footer`
-    width: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: ${fonts.sans};
+  position: relative;
+  bottom: 0;
+  left: 0;
+  ul {
+    list-style-type: none;
+    padding: 24px 48px;
     margin: 0;
-    padding: 0;
-    font-family: ${fonts.sans};
-    position: relative;
-    bottom: 0;
-    left: 0;
-    ul {
-        list-style-type: none;
-        padding: 24px 48px;
-        margin: 0;
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        /* justify-content: center; */
-        opacity: .5;
-        transition: .5s;
-        &:hover {
-            opacity: 1;
-            transition: .5s;
-        }
-        li {
-            color: ${colors.white};
-            font-size: .75rem;
-            &:nth-of-type(2) {
-                cursor: pointer;
-            }
-            a {
-                color: ${colors.gold};
-                text-decoration: none;
-                transition: .5s;
-                opacity: 1;
-                &:hover {
-                    opacity: .5;
-                    transition: .5s;
-                }
-            }
-            &:nth-child(1) {
-                text-align: left;
-            }
-            &:nth-child(2) {
-                text-align: center;
-            }
-            &:nth-child(3) {
-                text-align: right;
-            }
-        }
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    opacity: .5;
+    transition: .5s;
+    &:hover {
+      opacity: 1;
+      transition: .5s;
     }
+    li {
+      color: ${colors.white};
+      font-size: .75rem;
+      &:nth-of-type(2) {
+        cursor: pointer;
+      }
+      a {
+        color: ${colors.gold};
+        text-decoration: none;
+        transition: .5s;
+        opacity: 1;
+        &:hover {
+          opacity: .5;
+          transition: .5s;
+        }
+      }
+      &:nth-child(1) {
+        text-align: left;
+      }
+      &:nth-child(2) {
+        text-align: center;
+      }
+      &:nth-child(3) {
+        text-align: right;
+      }
+    }
+  }
 `
