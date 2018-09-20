@@ -53,7 +53,7 @@ class App extends Component {
 
   checkUserDLC() {  
     // checks localStorage to see if values (DLC) currently exists and then append them to state
-    if (localStorage.getItem('ExtendedView') === 'unlocked') {
+    if (localStorage.getItem('Extended Current') === 'unlocked') {
       this.setState({
         ExtendedView: true,
         bareView: false
@@ -64,22 +64,22 @@ class App extends Component {
         bareView: true
       });
     }
-    if (localStorage.getItem('DailyForecast') !== null) {
+    if (localStorage.getItem('Daily Forecast') !== null) {
       this.setState({
         DailyForecast: true
       });
     }
-    if (localStorage.getItem('WeeklyForecast') !== null) {
+    if (localStorage.getItem('Weekly Forecast') !== null) {
       this.setState({
         WeeklyForecast: true
       });
     }
-    if (localStorage.getItem('ExtensiveWeather') !== null) {
+    if (localStorage.getItem('Extensive Weather') !== null) {
       this.setState({
         ExtensiveWeather: true
       });
     }
-    if (localStorage.getItem('ClassyAudio') !== null) {
+    if (localStorage.getItem('Classy Audio') !== null) {
       this.setState({
         ClassyAudio: true
       });
@@ -87,8 +87,6 @@ class App extends Component {
   }
 
   componentDidMount() {
-    
-    console.log('DlcData => CDM', DlcData)
     // checks local storage if user has entered a name
     if (typeof localStorage === "undefined" || localStorage === null) {
       let LocalStorage = require('node-localstorage').LocalStorage;
@@ -131,14 +129,13 @@ class App extends Component {
     });
   }
   getAllWeatherData() {
-    console.log("this.state.index => ", this.state.index);
-    if (this.state.index !== 4) {	
-      console.log('you already got the data, stop running');	
+    if (this.state.index !== 4) {
+      // returns a console log to stop re-calling the weather data + hitting the 1000 request per day cap
+      return console.log('you already got the data, stop running, lucky we stopped the requests here => also checked the user dlc too');	
     }
     // gets weather data based on the users lon/lat
     // checks if placeholder data is still placeholder data and sets the loading component to true
     if (this.state.allWeatherData === placeholder) {
-      console.warn('this is just placeholder data')
       this.setState({
         loading: true
       })
@@ -150,10 +147,6 @@ class App extends Component {
     let lonBefore = 149.0875;
     let latBefore = -35.238888888889;
     let locationNameBefore = "University of Canberra";
-
-    if (this.state.index !== 4) {	
-      console.log('you already got the data, stop running');	
-    }
 
     // check if user entered location co-ordinates + change place holder values if they did
     if (this.state.renderSearchOptions[0] !== undefined) {
@@ -179,16 +172,18 @@ class App extends Component {
     let lon = localStorage.getItem('location_lon');
     let lat = localStorage.getItem('location_lat');
 
-    // API calling DarkSky
+    // API calling DarkSky passing in
+    //    - herokuCORS (to stop Cross Origin errors)
+    //    - darkSkyUrl (constant defined globally / static url wont change)
+    //    - apiKey (secret API key imported from .env file)
+    //    - lon/lat (use the previously set variables of lat + lon)
     axios({
         method: 'GET',
-        //  passing in
-        //    - herokuCORS (to stop Cross Origin errors)
-        //    - darkSkyUrl (constant defined globally / static url wont change)
-        //    - apiKey (secret API key imported from .env file)
-        //    - lon/lat (use the previously set variables of lat + lon)
         url: herokuCORS + darkSkyUrl + apiKey + "/" + lat + "," + lon +"",
         responseType: 'json',
+        headers: {
+          'Access-Control-Allow-Origin': '*'
+        },
         mode: 'no-cors',
         params: {
           units: "auto"
@@ -208,17 +203,19 @@ class App extends Component {
 
     // adds one to the index state (stop the call being made multiple times)
     
-    console.log("this.state.index (before increment) => ", this.state.index);
-    this.incrementIndexByOne();
-    console.log("this.state.index (after increment) => ", this.state.index);
-  }
-
-  incrementIndexByOne() {
-    let { oldIndex } = this.state.index
-    console.log('oldIndex => ', oldIndex)
-    this.setState({
-      index: oldIndex + 1
-    });
+    // this.incrementIndexByOne(this.state.index);
+    // console.log("this.state.index (after increment) => ", this.state.index);
+    
+    if (this.state.index === 4) {
+      console.log("this.state.index (before increment) => ", this.state.index);
+      let oldIndex = this.state.index
+      console.log('oldIndex (init) => ', oldIndex)
+      oldIndex = oldIndex + 1
+      console.log('oldIndex (after add) => ', oldIndex)
+      this.setState({
+        index: oldIndex
+      });
+    }
   }
 
   // gets todays date - passes the value to the dayOfWeek + dateInMonth + getTheMonth array imports declared at the top
@@ -386,6 +383,7 @@ class App extends Component {
   // function handling closing the dlcView and
   // rechecking which DLC the user has purchased (and setting that state to true) 
   hideDlcOptions() {
+    console.log('hide DLC options + checkTheDLC please')
     this.setState({
       dlcView: false,
     })
@@ -393,13 +391,13 @@ class App extends Component {
   }
 
   // resets all data / clears all localStorage and forces a window reload/refresh
-  // handleRemoveDLC() {
-  //   localStorage.clear();
-  //   window.location.reload();
-  //   this.setState({
-  //     index: 0
-  //   });
-  // }
+  handleRemoveDLC() {
+    localStorage.clear();
+    window.location.reload();
+    this.setState({
+      index: 0
+    });
+  }
 
   render() {
     const { renderSearchOptions } = this.state;
@@ -478,15 +476,13 @@ class App extends Component {
     let DlcView = null;
 
     if (this.state.dlcView === true) {
-      console.log('DlcData (in component) => ', DlcData)
       DlcView = (
         <DlcViewContainer>
           <H2f>Weather Expansion Packs</H2f>
           <section>
-          {
+          { // maps over the DlcData and then displays then renders the data
             DlcData.map((key, index) =>
               {
-                console.log("DlcData ( inside map )=> ", DlcData)
                 let textOpacity = '0.5';
                 let buyOrNah = true;
                 // checks if the user has purchased the DLC and sets styles
@@ -494,8 +490,6 @@ class App extends Component {
                   textOpacity = '1'
                   buyOrNah = false
                 }
-                console.log('key (of DlcData.map()) => ', key)
-                console.log('index (of DlcData.map()) => ', index)
                 return (
                   <div key={index}>
                     <H3f style={{opacity: textOpacity}}>
@@ -525,7 +519,7 @@ class App extends Component {
     // Extended View (from base view)
     // checks if ExtendedView === true and renders the element
     if (this.state.ExtendedView === true) {
-      // this.getAllWeatherData();
+      this.getAllWeatherData();
       ExtendedView = (
         <ExtendedViewContaier>
           <LineHR/>
