@@ -1,3 +1,4 @@
+// arrays used to match the index returned by DarkSkyAPI
 export const dayOfWeek = [
   'Sunday',
   'Monday',

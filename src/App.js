@@ -6,25 +6,33 @@ import { Transition, animated, Spring } from 'react-spring'
 
 // components
 import Loading from './components/loading';
-// import Footer from './components/footer';
 import logo from './images/posh_weather.svg';
+// import some css variables to be used by styled-components
 import { colors, fonts, view } from './config/_variables';
+// import placeholder data for testing
 import placeholder from './config/placeholder_weather'
+// import objects that match an index to the corresponding array of values
 import { dayOfWeek, getTheMonth, dateInMonth, TwentyFourToTwleve } from './config/date_data'
+// imports the dlc data object (later to be mapped)
+import DlcData from './config/dlc_data'
 
-// global variables
+// global variables (process.env.*VAR_NAME* pulls in keys from a hidden .env file)
 const apiKey = process.env.REACT_APP_CONFIG_DARK_SKY;
+// set constant url paths for easier use when fetching data
 const darkSkyUrl = "https://api.darksky.net/forecast/";
 const herokuCORS = "https://cors-anywhere.herokuapp.com/";
 
+// init mapbox
 const mapboxKey = process.env.REACT_APP_MAPBOX_CONFIG;
 const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
 const geocodingClient = mbxGeocoding({ accessToken: mapboxKey });
 
+// main App component
 class App extends Component {
   constructor(props) {
     super(props);
 
+    // setting state for values
     this.state = {
       loading: false,
       index: 0,
@@ -43,7 +51,8 @@ class App extends Component {
     }
   }
 
-  checkUserDLC() {
+  checkUserDLC() {  
+    // checks localStorage to see if values (DLC) currently exists and then append them to state
     if (localStorage.getItem('ExtendedView') === 'unlocked') {
       this.setState({
         ExtendedView: true,
@@ -78,6 +87,8 @@ class App extends Component {
   }
 
   componentDidMount() {
+    
+    console.log('DlcData => CDM', DlcData)
     // checks local storage if user has entered a name
     if (typeof localStorage === "undefined" || localStorage === null) {
       let LocalStorage = require('node-localstorage').LocalStorage;
@@ -96,6 +107,7 @@ class App extends Component {
     // check user DLC 
     this.checkUserDLC();
 
+    // if user data does exist - skip the welcome screens and go straight to the data
     if (localStorage.getItem('username') !== 'User' && localStorage.getItem('location_name') !== 'Location') {
       this.setState({
         index: 4
@@ -103,22 +115,28 @@ class App extends Component {
     }
   }
 
+  // mapBox geocoding request -> turns location string (full or part) into data (lat/lon/full location text)
   getUserLocation(user_query) {
     geocodingClient.forwardGeocode({
       query: user_query,
       limit: 5
-  })
-  .send()
-  .then(response => {
-    if (this.state.renderSearchOptions !== response.body.features) {
-      this.setState({
-        renderSearchOptions: response.body.features
-      });
-    }
-  });
-
+    })
+    .send()
+    .then(response => {
+      if (this.state.renderSearchOptions !== response.body.features) {
+        this.setState({
+          renderSearchOptions: response.body.features
+        });
+      }
+    });
   }
   getAllWeatherData() {
+    console.log("this.state.index => ", this.state.index);
+    if (this.state.index !== 4) {	
+      console.log('you already got the data, stop running');	
+    }
+    // gets weather data based on the users lon/lat
+    // checks if placeholder data is still placeholder data and sets the loading component to true
     if (this.state.allWeatherData === placeholder) {
       console.warn('this is just placeholder data')
       this.setState({
@@ -126,13 +144,21 @@ class App extends Component {
       })
     }
 
+    console.log('no more placeholder')
+
     // set placeholder values for empty location input
     let lonBefore = 149.0875;
     let latBefore = -35.238888888889;
     let locationNameBefore = "University of Canberra";
 
+    if (this.state.index !== 4) {	
+      console.log('you already got the data, stop running');	
+    }
+
     // check if user entered location co-ordinates + change place holder values if they did
     if (this.state.renderSearchOptions[0] !== undefined) {
+      
+      console.log('this.state.renderSearchOptions === null/undefined')
       lonBefore = this.state.renderSearchOptions[0].geometry.coordinates[0];
       latBefore = this.state.renderSearchOptions[0].geometry.coordinates[1]
       locationNameBefore = this.state.renderSearchOptions[0].text;
@@ -143,16 +169,24 @@ class App extends Component {
         localStorage.getItem('location_lon') === null ||
         localStorage.getItem('location_lat') === null
     ) {
+      console.log('localStorage stuff doesnt exist')
       localStorage.setItem('location_lon', lonBefore)
       localStorage.setItem('location_lat', latBefore)
       localStorage.setItem('location_name', locationNameBefore)
     }
 
+    // set lat/lon to the localStorage data
     let lon = localStorage.getItem('location_lon');
     let lat = localStorage.getItem('location_lat');
 
+    // API calling DarkSky
     axios({
         method: 'GET',
+        //  passing in
+        //    - herokuCORS (to stop Cross Origin errors)
+        //    - darkSkyUrl (constant defined globally / static url wont change)
+        //    - apiKey (secret API key imported from .env file)
+        //    - lon/lat (use the previously set variables of lat + lon)
         url: herokuCORS + darkSkyUrl + apiKey + "/" + lat + "," + lon +"",
         responseType: 'json',
         mode: 'no-cors',
@@ -160,47 +194,60 @@ class App extends Component {
           units: "auto"
         }
     }).then( (response) => {
+        // just a bit of error handling on the call / user will get an alert if the request fails
         if (response === this.state.allWeatherData) {
             alert('error creating timeline entry');
         }
-        // let indVal = this.state.index;
+        // sets allWeatherData to the response data and disables the loading component
+        console.log('successfully got DarkSky Data')
         this.setState({
             allWeatherData: response.data,
             loading: false
         });
     });
 
+    // adds one to the index state (stop the call being made multiple times)
+    
+    console.log("this.state.index (before increment) => ", this.state.index);
     this.incrementIndexByOne();
+    console.log("this.state.index (after increment) => ", this.state.index);
   }
 
   incrementIndexByOne() {
+    let { oldIndex } = this.state.index
+    console.log('oldIndex => ', oldIndex)
     this.setState({
-      index: this.state.index + 1
+      index: oldIndex + 1
     });
   }
 
+  // gets todays date - passes the value to the dayOfWeek + dateInMonth + getTheMonth array imports declared at the top
+  // returns a string of the date. e.g. Thursday 20th of September
   getTheDate() {
     let today = new Date();
     let returnTime = dayOfWeek[today.getDay()] + ' ' + dateInMonth[today.getDate() - 1] + ' of ' + getTheMonth[today.getMonth()]; 
     return returnTime
   }
 
+  // converts the raw degrees data into a readable string
   degreesToDirection(num) {
       var val = Math.floor((num / 22.5) + 0.5);
       var arr = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
       return arr[(val % 16)];
   }
 
-  // daily forecast functions
+  // 24hr forecast
   mapDailyForecastTime(weather_data) {
+    // maps over each value in the weather_data variable
     let dailyForecast = weather_data.map((key, index) => {
-      // caps hours to 24hrs
+      // caps hours to 24hrs (dont return more than 24hrs in advance)
       if (index >= 24) {
         return null
       }
       else {
         return (
           <li key={key.time}>
+            {/* converts 24hr time to 12hr time */}
             <H3f>{ TwentyFourToTwleve[new Date(new Date(key.time * 1000).toISOString()).getHours()] }</H3f>
           </li>
         )
@@ -209,7 +256,9 @@ class App extends Component {
     return dailyForecast;
   }
 
+  // Weekly forecast 
   mapDailyForecastDay(weather_data) {
+    // maps over each value in the weather_data variable
     let dailyForecast = weather_data.map((key, index) => {
       if (index >= 24) {
         return null
@@ -218,6 +267,7 @@ class App extends Component {
         return (
           <li key={key.time}>
             <LineHR100/>
+            {/* rounds temperature value */}
             <H2f>{ Math.round(key.temperature * 1000 / 1000 ) }°</H2f>
             <LineHR100/>
           </li>
@@ -227,6 +277,7 @@ class App extends Component {
     return dailyForecast;
   }
 
+  // 24hr forecast precipitation handling
   mapDailyForecastPrecip(weather_data) {
     let dailyForecast = weather_data.map((key, index) => {
       if (index >= 24) {
@@ -234,8 +285,10 @@ class App extends Component {
       }
       else {
         let tempPercent = key.precipProbability * 100;
+        // sets the amount of columns to display
         let dynamicGridTemplate = '1fr ' + (key.precipProbability * 60) + '%';
         return (
+          // inline styling, dynamic based on value inputs
           <li key={key.time} style={{marginBottom: '8px'}}>
             <GraphDiv style={{display: 'grid', gridTemplateRows: dynamicGridTemplate}}>
               <H3f>{tempPercent}%</H3f>
@@ -248,7 +301,8 @@ class App extends Component {
     return dailyForecast;
   }
 
-  // weekly forecast functions
+  // Weekly forecast functions
+  // Weekly forecast time (gets the days of the week)
   mapWeeklyForecastTime(weather_data) {
     let weeklyForecast = weather_data.map((key, index) => {
       if (index === 0) {
@@ -257,6 +311,7 @@ class App extends Component {
       else {
         return (
           <li key={key.time}>
+            {/* matches the index to the imported array string*/}
             <H3f>{ dayOfWeek[new Date(new Date(key.time * 1000).toISOString()).getDay()] }</H3f>
           </li>
         )
@@ -304,8 +359,10 @@ class App extends Component {
     return weeklyForecast;
   }
 
+  // creates a toggle function that adds +1 to the this.state.index to progress through the welcome screens
   toggle = e => this.setState(state => ({ index: state.index === 5 ? 0 : state.index + 1 }))
 
+  // sets the value of the dlc to unlocked - run onClick when user purchases DLC
   getDLC(value, force) {
     localStorage.setItem(value, 'unlocked')
     if (force !== null) {
@@ -313,6 +370,7 @@ class App extends Component {
     }
   }
 
+  // function to set the state of all DLC to false to show the dlcView component
   showDlcOptions() {
     this.setState({
       dlcView: true,
@@ -325,6 +383,8 @@ class App extends Component {
     })
   }
 
+  // function handling closing the dlcView and
+  // rechecking which DLC the user has purchased (and setting that state to true) 
   hideDlcOptions() {
     this.setState({
       dlcView: false,
@@ -332,18 +392,21 @@ class App extends Component {
     this.checkUserDLC();
   }
 
-  handleRemoveDLC() {
-    localStorage.clear();
-    window.location.reload();
-    this.setState({
-      index: 0
-    });
-  }
+  // resets all data / clears all localStorage and forces a window reload/refresh
+  // handleRemoveDLC() {
+  //   localStorage.clear();
+  //   window.location.reload();
+  //   this.setState({
+  //     index: 0
+  //   });
+  // }
 
   render() {
     const { renderSearchOptions } = this.state;
     // welcome slides (if no local storage data)
+    // pages variable is used with react-spring
     const pages = [
+      // animated.div is part of react-spring
       style => <animated.div key="1" style={{ ...style}}>
           <SlideItem>
             <DlcButton onClick={this.toggle}>Next</DlcButton>
@@ -367,6 +430,11 @@ class App extends Component {
               <UserInput id="location" type="text" autocomplete="no_today" required
                   onChange={(evt) => {this.getUserLocation(evt.target.value);}}
               />
+              {
+                // renders the search opotions as the user types.
+                // runs the function onChange to create suggested search opotions
+                // maps over the array of opotions and renders them to the page
+              }
               {
                 renderSearchOptions.map(key =>
                   <Spring key={key.id}
@@ -395,6 +463,7 @@ class App extends Component {
     </animated.div>
     ];
 
+    // loading ...
     if (this.state.loading === true) {
       return <Loading/>
     }
@@ -408,35 +477,8 @@ class App extends Component {
     let ClassyAudio = null;
     let DlcView = null;
 
-    const DlcData = [
-      {
-        "title": "Extended Current",
-        "state_ref": "ExtendedView",
-        "cost": "50"
-      },
-      {
-        "title": "Daily Forecast",
-        "state_ref": "DailyForecast",
-        "cost": "100"
-      },
-      {
-        "title": "Weekly Forecast",
-        "state_ref": "WeeklyForecast",
-        "cost": "250"
-      },
-      {
-        "title": "Extensive Weather",
-        "state_ref": "ExtensiveWeather",
-        "cost": "500"
-      },
-      {
-        "title": "Classy Audio",
-        "state_ref": "ClassyAudio",
-        "cost": "1000"
-      },
-    ]
-
     if (this.state.dlcView === true) {
+      console.log('DlcData (in component) => ', DlcData)
       DlcView = (
         <DlcViewContainer>
           <H2f>Weather Expansion Packs</H2f>
@@ -444,12 +486,16 @@ class App extends Component {
           {
             DlcData.map((key, index) =>
               {
+                console.log("DlcData ( inside map )=> ", DlcData)
                 let textOpacity = '0.5';
                 let buyOrNah = true;
-                if (localStorage.getItem(`${key.state_ref}`) === "unlocked") {
+                // checks if the user has purchased the DLC and sets styles
+                if (localStorage.getItem(`${key.title}`) === "unlocked") {
                   textOpacity = '1'
                   buyOrNah = false
                 }
+                console.log('key (of DlcData.map()) => ', key)
+                console.log('index (of DlcData.map()) => ', index)
                 return (
                   <div key={index}>
                     <H3f style={{opacity: textOpacity}}>
@@ -459,7 +505,8 @@ class App extends Component {
                     <H2f style={{opacity: textOpacity}}>{key.title}</H2f>
                     <LineHR/>
                     {buyOrNah ?
-                    <H3f><DlcButton value={key.state_ref} onClick={(evt) => this.getDLC(evt.target.value, 'force')}>
+                    // onClick, run the getDLC funtion to unlock dlc
+                    <H3f><DlcButton value={key.title} onClick={(evt) => this.getDLC(evt.target.value, 'force')}>
                       Unlock now for ${key.cost}/month</DlcButton>
                     </H3f>
                     :
@@ -476,8 +523,9 @@ class App extends Component {
     }
 
     // Extended View (from base view)
+    // checks if ExtendedView === true and renders the element
     if (this.state.ExtendedView === true) {
-      this.getAllWeatherData();
+      // this.getAllWeatherData();
       ExtendedView = (
         <ExtendedViewContaier>
           <LineHR/>
@@ -508,6 +556,7 @@ class App extends Component {
     }
 
     // Daily Forecast
+    // checks if DailyForecast === true and renders the element
     if (this.state.DailyForecast === true) {
       DailyForecast = (
         <DailyForecastContainer>
@@ -530,6 +579,7 @@ class App extends Component {
     }
 
     // Weekly Forecast
+    // checks if WeeklyForecast === true and renders the element
     if (this.state.WeeklyForecast === true) {
       WeeklyForecast = (
         <WeeklyForecastContainer>
@@ -552,6 +602,7 @@ class App extends Component {
     }
 
     // Extensive Weather
+    // checks if ExtensiveWeather === true and renders the element
     if (this.state.ExtensiveWeather === true) {
       ExtensiveWeather = (
         <ExtensiveWeatherContainer>
@@ -589,12 +640,14 @@ class App extends Component {
     }
 
     //classy audio
+    // checks if ClassyAudio === true and renders the element
     if (this.state.ClassyAudio === true) {
       ClassyAudio = (
         <ClassyAudioContainer>
           <H2f>Posh Vibes</H2f>
           <LineHR/>
           <div>
+            {/* displays the spotify playlist embed */}
             <iframe
               title="spotify embed"
               src="https://open.spotify.com/embed/user/12162909955/playlist/1yeKPPV6xZ0ESc3zc4EVnY"
@@ -623,9 +676,12 @@ class App extends Component {
           <DlcButton style={{marginTop: "36px"}} onClick={() => this.showDlcOptions()}>Expansion Packs</DlcButton>
         </BareViewContainer>
       )
+    } else {
+      bareView = null;
     }
 
     // welcome slider
+    // checks if the index !== 5 and renders the welcomeSlider (or not)
     if (this.state.index !== 5) {
       welcomeSlider = (
         <WelcomeSliderContainer>
@@ -647,8 +703,10 @@ class App extends Component {
       welcomeSlider = null;
     }
 
+    // returns main app
     return (
       <AppContainer className="App">
+        {/* Spring to animate in the top data (very sutble) */}
         <Spring delay={1000} from={{opacity: 0, paddingTop: "-100px"}} to={{opacity: 1, paddingTop: "24px" }}>
           {styles =>
             <TopBar style={styles}>
@@ -683,6 +741,13 @@ class App extends Component {
 }
 
 export default App;
+
+// all of the styling for the above components
+// use of styled components instead of traditional CSS (or SASS)
+// ${variables} are imported at the top
+//  - colours
+//  - fonts
+//  - sizes
 
 const UserInput = styled.input`
   color: ${colors.gold};
