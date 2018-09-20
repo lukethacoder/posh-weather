@@ -399,6 +399,22 @@ class App extends Component {
     });
   }
 
+  // allows users to hit enter when entering data on the welcome screen
+  _handleKeyPress = (e) => {
+    // checks if the user has hit enter
+    if (e.key === 'Enter') {
+      console.log('user hit enter');
+      // check if either username input or location input 
+      if (e.target.id === 'location') {
+        this.getUserLocation(e.target.value)
+      }
+      if (e.target.id === 'name_of_user') {
+        localStorage.setItem('username', e.target.value);
+      }
+      this.toggle()
+    }
+  }
+
   render() {
     const { renderSearchOptions } = this.state;
     // welcome slides (if no local storage data)
@@ -416,7 +432,7 @@ class App extends Component {
           <SlideItem>
             <DlcButton onClick={this.toggle}>Next</DlcButton>
             <SerifText>Jolly good to make your acquaintance. <br/>What may your name be?</SerifText>
-            <UserInput id="name_of_user" type="text" autocomplete="no_today" required
+            <UserInput id="name_of_user" type="text" autocomplete="no_today" required onKeyPress={this._handleKeyPress}
                 onChange={(evt) => { localStorage.setItem('username', evt.target.value);}}
             />
           </SlideItem>
@@ -426,7 +442,7 @@ class App extends Component {
             <DlcButton onClick={this.toggle}>Next</DlcButton>
               <SerifText>Where are you right now?</SerifText>
               <UserInput id="location" type="text" autocomplete="no_today" required
-                  onChange={(evt) => {this.getUserLocation(evt.target.value);}}
+                  onChange={(evt) => {this.getUserLocation(evt.target.value);}} onKeyPress={this._handleKeyPress}
               />
               {
                 // renders the search opotions as the user types.
@@ -724,9 +740,9 @@ class App extends Component {
         </MainContentContainer>
         <FooterContainer classname="loading-component">
           <ul>
-            <li>Built by <a href="https://lukesecomb.digital">Luke Secomb</a></li>
+            <li>Built by <a href="https://lukesecomb.digital" target="_blank">Luke Secomb</a></li>
             <li onClick={() => this.handleRemoveDLC()}>reset Weather Expansion Data</li>
-            <li>Powered by <a href="https://darksky.net/poweredby/" rel="nofollow noreferrer">Dark Sky</a></li>
+            <li>Powered by <a href="https://darksky.net/poweredby/" target="_blank" rel="nofollow noreferrer">Dark Sky</a></li>
           </ul>
         </FooterContainer>
       </AppContainer>
