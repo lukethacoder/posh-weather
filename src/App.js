@@ -131,7 +131,7 @@ class App extends Component {
   getAllWeatherData() {
     if (this.state.index !== 4) {
       // returns a console log to stop re-calling the weather data + hitting the 1000 request per day cap
-      return console.log('you already got the data, stop running, lucky we stopped the requests here => also checked the user dlc too');	
+      return console.log('got the data, stop running so we dont overload the API');	
     }
     // gets weather data based on the users lon/lat
     // checks if placeholder data is still placeholder data and sets the loading component to true
@@ -140,8 +140,6 @@ class App extends Component {
         loading: true
       })
     }
-
-    console.log('no more placeholder')
 
     // set placeholder values for empty location input
     let lonBefore = 149.0875;
@@ -188,17 +186,23 @@ class App extends Component {
         params: {
           units: "auto"
         }
+    }).catch(function (error) {
+      if (error.response.status === 403) {
+        alert('maximum API requests reached for the day - come back and try again tomorrow')
+      }
     }).then( (response) => {
         // just a bit of error handling on the call / user will get an alert if the request fails
-        if (response === this.state.allWeatherData) {
-            alert('error creating timeline entry');
-        }
-        // sets allWeatherData to the response data and disables the loading component
-        console.log('successfully got DarkSky Data')
         this.setState({
+            allWeatherData: null,
+            loading: true
+        });
+        // if we have data - set loading to false and assign data to allWeatherData
+        if (response !== undefined) {
+          this.setState({
             allWeatherData: response.data,
             loading: false
         });
+        }
     });
 
     // adds one to the index state (stop the call being made multiple times)
@@ -207,11 +211,8 @@ class App extends Component {
     // console.log("this.state.index (after increment) => ", this.state.index);
     
     if (this.state.index === 4) {
-      console.log("this.state.index (before increment) => ", this.state.index);
       let oldIndex = this.state.index
-      console.log('oldIndex (init) => ', oldIndex)
       oldIndex = oldIndex + 1
-      console.log('oldIndex (after add) => ', oldIndex)
       this.setState({
         index: oldIndex
       });
@@ -383,7 +384,6 @@ class App extends Component {
   // function handling closing the dlcView and
   // rechecking which DLC the user has purchased (and setting that state to true) 
   hideDlcOptions() {
-    console.log('hide DLC options + checkTheDLC please')
     this.setState({
       dlcView: false,
     })
