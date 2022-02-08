@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
-import { Transition, animated, Spring } from 'react-spring'
+import { Transition, animated, Spring } from 'react-spring';
 
 // components
 import Loading from './components/loading';
@@ -10,17 +10,17 @@ import logo from './images/posh_weather.svg';
 // import some css variables to be used by styled-components
 import { colors, fonts, view } from './config/_variables';
 // import placeholder data for testing
-import placeholder from './config/placeholder_weather'
+import placeholder from './config/placeholder_weather';
 // import objects that match an index to the corresponding array of values
-import { dayOfWeek, getTheMonth, dateInMonth, TwentyFourToTwleve } from './config/date_data'
+import { dayOfWeek, getTheMonth, dateInMonth, TwentyFourToTwleve } from './config/date_data';
 // imports the dlc data object (later to be mapped)
-import DlcData from './config/dlc_data'
+import DlcData from './config/dlc_data';
 
 // global variables (process.env.*VAR_NAME* pulls in keys from a hidden .env file)
 const apiKey = process.env.REACT_APP_CONFIG_DARK_SKY;
 // set constant url paths for easier use when fetching data
-const darkSkyUrl = "https://api.darksky.net/forecast/";
-const herokuCORS = "https://cors-anywhere.herokuapp.com/";
+const darkSkyUrl = 'https://api.darksky.net/forecast/';
+const herokuCORS = 'https://cors-anywhere.herokuapp.com/';
 
 // init mapbox
 const mapboxKey = process.env.REACT_APP_MAPBOX_CONFIG;
@@ -48,47 +48,47 @@ class App extends Component {
       ExtensiveWeather: false,
       ClassyAudio: false,
       dlcView: false,
-    }
+    };
   }
 
-  checkUserDLC() {  
+  checkUserDLC() {
     // checks localStorage to see if values (DLC) currently exists and then append them to state
     if (localStorage.getItem('Extended Current') === 'unlocked') {
       this.setState({
         ExtendedView: true,
-        bareView: false
+        bareView: false,
       });
     } else {
       this.setState({
         ExtendedView: false,
-        bareView: true
+        bareView: true,
       });
     }
     if (localStorage.getItem('Daily Forecast') !== null) {
       this.setState({
-        DailyForecast: true
+        DailyForecast: true,
       });
     }
     if (localStorage.getItem('Weekly Forecast') !== null) {
       this.setState({
-        WeeklyForecast: true
+        WeeklyForecast: true,
       });
     }
     if (localStorage.getItem('Extensive Weather') !== null) {
       this.setState({
-        ExtensiveWeather: true
+        ExtensiveWeather: true,
       });
     }
     if (localStorage.getItem('Classy Audio') !== null) {
       this.setState({
-        ClassyAudio: true
+        ClassyAudio: true,
       });
     }
   }
 
   componentDidMount() {
     // checks local storage if user has entered a name
-    if (typeof localStorage === "undefined" || localStorage === null) {
+    if (typeof localStorage === 'undefined' || localStorage === null) {
       let LocalStorage = require('node-localstorage').LocalStorage;
       // eslint-disable-next-line
       localStorage = new LocalStorage('./scratch');
@@ -102,68 +102,63 @@ class App extends Component {
       localStorage.setItem('location_name', 'Location');
     }
 
-    // check user DLC 
+    // check user DLC
     this.checkUserDLC();
 
     // if user data does exist - skip the welcome screens and go straight to the data
     if (localStorage.getItem('username') !== 'User' && localStorage.getItem('location_name') !== 'Location') {
       this.setState({
-        index: 4
+        index: 4,
       });
     }
   }
 
   // mapBox geocoding request -> turns location string (full or part) into data (lat/lon/full location text)
   getUserLocation(user_query) {
-    geocodingClient.forwardGeocode({
-      query: user_query,
-      limit: 5
-    })
-    .send()
-    .then(response => {
-      if (this.state.renderSearchOptions !== response.body.features) {
-        this.setState({
-          renderSearchOptions: response.body.features
-        });
-      }
-    });
+    geocodingClient
+      .forwardGeocode({
+        query: user_query,
+        limit: 5,
+      })
+      .send()
+      .then((response) => {
+        if (this.state.renderSearchOptions !== response.body.features) {
+          this.setState({
+            renderSearchOptions: response.body.features,
+          });
+        }
+      });
   }
   getAllWeatherData() {
     if (this.state.index !== 4) {
       // returns a console log to stop re-calling the weather data + hitting the 1000 request per day cap
-      return console.log('got the data, stop running so we dont overload the API');	
+      return console.log('got the data, stop running so we dont overload the API');
     }
     // gets weather data based on the users lon/lat
     // checks if placeholder data is still placeholder data and sets the loading component to true
     if (this.state.allWeatherData === placeholder) {
       this.setState({
-        loading: true
-      })
+        loading: true,
+      });
     }
 
     // set placeholder values for empty location input
     let lonBefore = 149.0875;
     let latBefore = -35.238888888889;
-    let locationNameBefore = "University of Canberra";
+    let locationNameBefore = 'University of Canberra';
 
     // check if user entered location co-ordinates + change place holder values if they did
     if (this.state.renderSearchOptions[0] !== undefined) {
-      
-      console.log('this.state.renderSearchOptions === null/undefined')
       lonBefore = this.state.renderSearchOptions[0].geometry.coordinates[0];
-      latBefore = this.state.renderSearchOptions[0].geometry.coordinates[1]
+      latBefore = this.state.renderSearchOptions[0].geometry.coordinates[1];
       locationNameBefore = this.state.renderSearchOptions[0].text;
     }
 
     // check if local storage data exits
-    if (localStorage.getItem('location_name') === null ||
-        localStorage.getItem('location_lon') === null ||
-        localStorage.getItem('location_lat') === null
-    ) {
-      console.log('localStorage stuff doesnt exist')
-      localStorage.setItem('location_lon', lonBefore)
-      localStorage.setItem('location_lat', latBefore)
-      localStorage.setItem('location_name', locationNameBefore)
+    if (localStorage.getItem('location_name') === null || localStorage.getItem('location_lon') === null || localStorage.getItem('location_lat') === null) {
+      localStorage.setItem('location_lon', lonBefore);
+      localStorage.setItem('location_lat', latBefore);
+      localStorage.setItem('location_name', locationNameBefore);
     }
 
     // set lat/lon to the localStorage data
@@ -176,45 +171,47 @@ class App extends Component {
     //    - apiKey (secret API key imported from .env file)
     //    - lon/lat (use the previously set variables of lat + lon)
     axios({
-        method: 'GET',
-        url: herokuCORS + darkSkyUrl + apiKey + "/" + lat + "," + lon +"",
-        responseType: 'json',
-        headers: {
-          'Access-Control-Allow-Origin': '*'
-        },
-        mode: 'no-cors',
-        params: {
-          units: "auto"
+      method: 'GET',
+      url: `${process.env.NODE_ENV === 'development' ? herokuCORS : ''}${darkSkyUrl}${apiKey}/${lat},${lon}`,
+      responseType: 'json',
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
+      mode: 'no-cors',
+      params: {
+        units: 'auto',
+      },
+    })
+      .catch(function (error) {
+        if (error.response.status === 403) {
+          alert('maximum API requests reached for the day - come back and try again tomorrow');
         }
-    }).catch(function (error) {
-      if (error.response.status === 403) {
-        alert('maximum API requests reached for the day - come back and try again tomorrow')
-      }
-    }).then( (response) => {
+      })
+      .then((response) => {
         // just a bit of error handling on the call / user will get an alert if the request fails
         this.setState({
-            allWeatherData: null,
-            loading: true
+          allWeatherData: null,
+          loading: true,
         });
         // if we have data - set loading to false and assign data to allWeatherData
         if (response !== undefined) {
           this.setState({
             allWeatherData: response.data,
-            loading: false
-        });
+            loading: false,
+          });
         }
-    });
+      });
 
     // adds one to the index state (stop the call being made multiple times)
-    
+
     // this.incrementIndexByOne(this.state.index);
     // console.log("this.state.index (after increment) => ", this.state.index);
-    
+
     if (this.state.index === 4) {
-      let oldIndex = this.state.index
-      oldIndex = oldIndex + 1
+      let oldIndex = this.state.index;
+      oldIndex = oldIndex + 1;
       this.setState({
-        index: oldIndex
+        index: oldIndex,
       });
     }
   }
@@ -223,15 +220,15 @@ class App extends Component {
   // returns a string of the date. e.g. Thursday 20th of September
   getTheDate() {
     let today = new Date();
-    let returnTime = dayOfWeek[today.getDay()] + ' ' + dateInMonth[today.getDate() - 1] + ' of ' + getTheMonth[today.getMonth()]; 
-    return returnTime
+    let returnTime = dayOfWeek[today.getDay()] + ' ' + dateInMonth[today.getDate() - 1] + ' of ' + getTheMonth[today.getMonth()];
+    return returnTime;
   }
 
   // converts the raw degrees data into a readable string
   degreesToDirection(num) {
-      var val = Math.floor((num / 22.5) + 0.5);
-      var arr = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
-      return arr[(val % 16)];
+    var val = Math.floor(num / 22.5 + 0.5);
+    var arr = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+    return arr[val % 16];
   }
 
   // 24hr forecast
@@ -240,38 +237,36 @@ class App extends Component {
     let dailyForecast = weather_data.map((key, index) => {
       // caps hours to 24hrs (dont return more than 24hrs in advance)
       if (index >= 24) {
-        return null
-      }
-      else {
+        return null;
+      } else {
         return (
           <li key={key.time}>
             {/* converts 24hr time to 12hr time */}
-            <H3f>{ TwentyFourToTwleve[new Date(new Date(key.time * 1000).toISOString()).getHours()] }</H3f>
+            <H3f>{TwentyFourToTwleve[new Date(new Date(key.time * 1000).toISOString()).getHours()]}</H3f>
           </li>
-        )
+        );
       }
-    })
+    });
     return dailyForecast;
   }
 
-  // Weekly forecast 
+  // Weekly forecast
   mapDailyForecastDay(weather_data) {
     // maps over each value in the weather_data variable
     let dailyForecast = weather_data.map((key, index) => {
       if (index >= 24) {
-        return null
-      }
-      else {
+        return null;
+      } else {
         return (
           <li key={key.time}>
-            <LineHR100/>
+            <LineHR100 />
             {/* rounds temperature value */}
-            <H2f>{ Math.round(key.temperature * 1000 / 1000 ) }°</H2f>
-            <LineHR100/>
+            <H2f>{Math.round((key.temperature * 1000) / 1000)}°</H2f>
+            <LineHR100 />
           </li>
-        )
+        );
       }
-    })
+    });
     return dailyForecast;
   }
 
@@ -279,23 +274,22 @@ class App extends Component {
   mapDailyForecastPrecip(weather_data) {
     let dailyForecast = weather_data.map((key, index) => {
       if (index >= 24) {
-        return null
-      }
-      else {
+        return null;
+      } else {
         let tempPercent = key.precipProbability * 100;
         // sets the amount of columns to display
-        let dynamicGridTemplate = '1fr ' + (key.precipProbability * 60) + '%';
+        let dynamicGridTemplate = '1fr ' + key.precipProbability * 60 + '%';
         return (
           // inline styling, dynamic based on value inputs
-          <li key={key.time} style={{marginBottom: '8px'}}>
-            <GraphDiv style={{display: 'grid', gridTemplateRows: dynamicGridTemplate}}>
+          <li key={key.time} style={{ marginBottom: '8px' }}>
+            <GraphDiv style={{ display: 'grid', gridTemplateRows: dynamicGridTemplate }}>
               <H3f>{tempPercent}%</H3f>
-              <div/>
+              <div />
             </GraphDiv>
           </li>
-        )
+        );
       }
-    })
+    });
     return dailyForecast;
   }
 
@@ -304,65 +298,64 @@ class App extends Component {
   mapWeeklyForecastTime(weather_data) {
     let weeklyForecast = weather_data.map((key, index) => {
       if (index === 0) {
-        return null
-      }
-      else {
+        return null;
+      } else {
         return (
           <li key={key.time}>
             {/* matches the index to the imported array string*/}
-            <H3f>{ dayOfWeek[new Date(new Date(key.time * 1000).toISOString()).getDay()] }</H3f>
+            <H3f>{dayOfWeek[new Date(new Date(key.time * 1000).toISOString()).getDay()]}</H3f>
           </li>
-        )
+        );
       }
-    })
+    });
     return weeklyForecast;
   }
 
   mapWeeklyForecastDay(weather_data) {
     let weeklyForecast = weather_data.map((key, index) => {
       if (index === 0) {
-        return null
-      }
-      else {
+        return null;
+      } else {
         return (
           <li key={key.time}>
-            <LineHR100/>
-            <H2f>{ Math.round(key.temperatureLow * 100 / 100 ) }°/{ Math.round(key.temperatureHigh * 100 / 100 ) }°</H2f>
-            <LineHR100/>
+            <LineHR100 />
+            <H2f>
+              {Math.round((key.temperatureLow * 100) / 100)}°/{Math.round((key.temperatureHigh * 100) / 100)}°
+            </H2f>
+            <LineHR100 />
           </li>
-        )
+        );
       }
-    })
+    });
     return weeklyForecast;
   }
 
   mapWeeklyForecastPrecip(weather_data) {
     let weeklyForecast = weather_data.map((key, index) => {
-      let tempPercent = Math.round(key.precipProbability * 1000 / 10);
-      let dynamicGridTemplate = '1fr ' + (key.precipProbability * 60) + '%';
+      let tempPercent = Math.round((key.precipProbability * 1000) / 10);
+      let dynamicGridTemplate = '1fr ' + key.precipProbability * 60 + '%';
       if (index === 0) {
-        return null
-      }
-      else {
+        return null;
+      } else {
         return (
-          <li key={key.time} style={{marginBottom: '8px'}}>
-            <GraphDiv style={{display: 'grid', gridTemplateRows: dynamicGridTemplate}}>
+          <li key={key.time} style={{ marginBottom: '8px' }}>
+            <GraphDiv style={{ display: 'grid', gridTemplateRows: dynamicGridTemplate }}>
               <H3f>{tempPercent}%</H3f>
-              <div/>
+              <div />
             </GraphDiv>
           </li>
-        )
+        );
       }
-    })
+    });
     return weeklyForecast;
   }
 
   // creates a toggle function that adds +1 to the this.state.index to progress through the welcome screens
-  toggle = e => this.setState(state => ({ index: state.index === 5 ? 0 : state.index + 1 }))
+  toggle = (e) => this.setState((state) => ({ index: state.index === 5 ? 0 : state.index + 1 }));
 
   // sets the value of the dlc to unlocked - run onClick when user purchases DLC
   getDLC(value, force) {
-    localStorage.setItem(value, 'unlocked')
+    localStorage.setItem(value, 'unlocked');
     if (force !== null) {
       this.forceUpdate();
     }
@@ -378,15 +371,15 @@ class App extends Component {
       WeeklyForecast: false,
       ExtensiveWeather: false,
       ClassyAudio: false,
-    })
+    });
   }
 
   // function handling closing the dlcView and
-  // rechecking which DLC the user has purchased (and setting that state to true) 
+  // rechecking which DLC the user has purchased (and setting that state to true)
   hideDlcOptions() {
     this.setState({
       dlcView: false,
-    })
+    });
     this.checkUserDLC();
   }
 
@@ -395,7 +388,7 @@ class App extends Component {
     localStorage.clear();
     window.location.reload();
     this.setState({
-      index: 0
+      index: 0,
     });
   }
 
@@ -404,16 +397,16 @@ class App extends Component {
     // checks if the user has hit enter
     if (e.key === 'Enter') {
       console.log('user hit enter');
-      // check if either username input or location input 
+      // check if either username input or location input
       if (e.target.id === 'location') {
-        this.getUserLocation(e.target.value)
+        this.getUserLocation(e.target.value);
       }
       if (e.target.id === 'name_of_user') {
         localStorage.setItem('username', e.target.value);
       }
-      this.toggle()
+      this.toggle();
     }
-  }
+  };
 
   render() {
     const { renderSearchOptions } = this.state;
@@ -421,65 +414,92 @@ class App extends Component {
     // pages variable is used with react-spring
     const pages = [
       // animated.div is part of react-spring
-      style => <animated.div key="1" style={{ ...style}}>
+      (style) => (
+        <animated.div key="1" style={{ ...style }}>
           <SlideItem>
             <DlcButton onClick={this.toggle}>Next</DlcButton>
-            <SerifText>Welcome to Posh Weather. <br/>
-            We believe in giving you the best weather experience money can buy</SerifText>
+            <SerifText>
+              Welcome to Posh Weather. <br />
+              We believe in giving you the best weather experience money can buy
+            </SerifText>
           </SlideItem>
-      </animated.div>,
-      style => <animated.div key="2" style={{ ...style}}>
+        </animated.div>
+      ),
+      (style) => (
+        <animated.div key="2" style={{ ...style }}>
           <SlideItem>
             <DlcButton onClick={this.toggle}>Next</DlcButton>
-            <SerifText>Jolly good to make your acquaintance. <br/>What may your name be?</SerifText>
-            <UserInput id="name_of_user" type="text" autocomplete="no_today" required onKeyPress={this._handleKeyPress}
-                onChange={(evt) => { localStorage.setItem('username', evt.target.value);}}
+            <SerifText>
+              Jolly good to make your acquaintance. <br />
+              What may your name be?
+            </SerifText>
+            <UserInput
+              id="name_of_user"
+              type="text"
+              autocomplete="no_today"
+              required
+              onKeyPress={this._handleKeyPress}
+              onChange={(evt) => {
+                localStorage.setItem('username', evt.target.value);
+              }}
             />
           </SlideItem>
-      </animated.div>,
-      style => <animated.div key="3" style={{ ...style}}>
+        </animated.div>
+      ),
+      (style) => (
+        <animated.div key="3" style={{ ...style }}>
           <SlideItem>
             <DlcButton onClick={this.toggle}>Next</DlcButton>
-              <SerifText>Where are you right now?</SerifText>
-              <UserInput id="location" type="text" autocomplete="no_today" required
-                  onChange={(evt) => {this.getUserLocation(evt.target.value);}} onKeyPress={this._handleKeyPress}
-              />
-              {
-                // renders the search opotions as the user types.
-                // runs the function onChange to create suggested search opotions
-                // maps over the array of opotions and renders them to the page
-              }
-              {
-                renderSearchOptions.map(key =>
-                  <Spring key={key.id}
-                    from={{opacity: 0, paddingTop: "-100px"}} to={{opacity: 1, paddingTop: "0px" }}
+            <SerifText>Where are you right now?</SerifText>
+            <UserInput
+              id="location"
+              type="text"
+              autocomplete="no_today"
+              required
+              onChange={(evt) => {
+                this.getUserLocation(evt.target.value);
+              }}
+              onKeyPress={this._handleKeyPress}
+            />
+            {
+              // renders the search opotions as the user types.
+              // runs the function onChange to create suggested search opotions
+              // maps over the array of opotions and renders them to the page
+            }
+            {renderSearchOptions.map((key) => (
+              <Spring key={key.id} from={{ opacity: 0, paddingTop: '-100px' }} to={{ opacity: 1, paddingTop: '0px' }}>
+                {(styles) => (
+                  <LocationOptions
+                    style={styles}
+                    key={key.id}
+                    onClick={() => {
+                      this.toggle();
+                      localStorage.setItem('location_lon', key.geometry.coordinates[0]);
+                      localStorage.setItem('location_lat', key.geometry.coordinates[1]);
+                      localStorage.setItem('location_name', key.text);
+                    }}
                   >
-                    {styles =>
-                      <LocationOptions style={styles} key={key.id}
-                        onClick={() => {
-                          this.toggle();
-                          localStorage.setItem('location_lon', key.geometry.coordinates[0]);
-                          localStorage.setItem('location_lat', key.geometry.coordinates[1]);
-                          localStorage.setItem('location_name', key.text);
-                        }}
-                      >{key.text}</LocationOptions>
-                    }
-                  </Spring>
-                )
-              }
+                    {key.text}
+                  </LocationOptions>
+                )}
+              </Spring>
+            ))}
           </SlideItem>
-      </animated.div>,
-      style => <animated.div key="4" style={{ ...style}}>
-        <SlideItem>
+        </animated.div>
+      ),
+      (style) => (
+        <animated.div key="4" style={{ ...style }}>
+          <SlideItem>
             <DlcButton onClick={this.toggle}>Next</DlcButton>
             <SerifText>We hope you enjoy your experience</SerifText>
-        </SlideItem>
-    </animated.div>
+          </SlideItem>
+        </animated.div>
+      ),
     ];
 
     // loading ...
     if (this.state.loading === true) {
-      return <Loading/>
+      return <Loading />;
     }
 
     let welcomeSlider = null;
@@ -496,40 +516,42 @@ class App extends Component {
         <DlcViewContainer>
           <H2f>Weather Expansion Packs</H2f>
           <section>
-          { // maps over the DlcData and then displays then renders the data
-            DlcData.map((key, index) =>
-              {
+            {
+              // maps over the DlcData and then displays then renders the data
+              DlcData.map((key, index) => {
                 let textOpacity = '0.5';
                 let buyOrNah = true;
                 // checks if the user has purchased the DLC and sets styles
-                if (localStorage.getItem(`${key.title}`) === "unlocked") {
-                  textOpacity = '1'
-                  buyOrNah = false
+                if (localStorage.getItem(`${key.title}`) === 'unlocked') {
+                  textOpacity = '1';
+                  buyOrNah = false;
                 }
                 return (
                   <div key={index}>
-                    <H3f style={{opacity: textOpacity}}>
-                      {buyOrNah ? 'Locked' : 'Unlocked'}
-                    </H3f>
-                    <LineHR/>
-                    <H2f style={{opacity: textOpacity}}>{key.title}</H2f>
-                    <LineHR/>
-                    {buyOrNah ?
-                    // onClick, run the getDLC funtion to unlock dlc
-                    <H3f><DlcButton value={key.title} onClick={(evt) => this.getDLC(evt.target.value, 'force')}>
-                      Unlock now for ${key.cost}/month</DlcButton>
-                    </H3f>
-                    :
-                    <H3f>Thank you for your purchase</H3f>}
+                    <H3f style={{ opacity: textOpacity }}>{buyOrNah ? 'Locked' : 'Unlocked'}</H3f>
+                    <LineHR />
+                    <H2f style={{ opacity: textOpacity }}>{key.title}</H2f>
+                    <LineHR />
+                    {buyOrNah ? (
+                      // onClick, run the getDLC funtion to unlock dlc
+                      <H3f>
+                        <DlcButton value={key.title} onClick={(evt) => this.getDLC(evt.target.value, 'force')}>
+                          Unlock now for ${key.cost}/month
+                        </DlcButton>
+                      </H3f>
+                    ) : (
+                      <H3f>Thank you for your purchase</H3f>
+                    )}
                   </div>
-                )
-              }
-            )
-          }
-          <DlcButton onClick={() => this.hideDlcOptions()}>Go back to the Weather</DlcButton>
+                );
+              })
+            }
+            <DlcButton onClick={() => this.hideDlcOptions()}>Go back to the Weather</DlcButton>
           </section>
         </DlcViewContainer>
-      )
+      );
+    } else {
+      DlcView = null;
     }
 
     // Extended View (from base view)
@@ -538,31 +560,33 @@ class App extends Component {
       this.getAllWeatherData();
       ExtendedView = (
         <ExtendedViewContaier>
-          <LineHR/>
+          <LineHR />
           <section>
             <div className="side_view_left">
               <H3f>Low</H3f>
-              <H2f>{Math.round( this.state.allWeatherData.daily.data[0].temperatureLow * 10 / 10)}°</H2f>
+              <H2f>{Math.round((this.state.allWeatherData.daily.data[0].temperatureLow * 10) / 10)}°</H2f>
             </div>
             <div className="main_section">
               <div>
                 <H3f>Currently</H3f>
-                <CurrentWeather>{Math.round( this.state.allWeatherData.currently.temperature * 10 / 10)}°</CurrentWeather>
+                <CurrentWeather>{Math.round((this.state.allWeatherData.currently.temperature * 10) / 10)}°</CurrentWeather>
               </div>
               <div>
                 <H3f>Apparent</H3f>
-                <H2f>{Math.round( this.state.allWeatherData.currently.apparentTemperature * 10 / 10)}°</H2f>
+                <H2f>{Math.round((this.state.allWeatherData.currently.apparentTemperature * 10) / 10)}°</H2f>
               </div>
             </div>
             <div className="side_view_right">
               <H3f>High</H3f>
-              <H2f>{Math.round( this.state.allWeatherData.daily.data[0].temperatureHigh  * 10 / 10)}°</H2f>
+              <H2f>{Math.round((this.state.allWeatherData.daily.data[0].temperatureHigh * 10) / 10)}°</H2f>
             </div>
           </section>
-          <LineHR/>
-          <DlcButton style={{marginTop: "36px"}} onClick={() => this.showDlcOptions()}>Expansion Packs</DlcButton>
+          <LineHR />
+          <DlcButton style={{ marginTop: '36px' }} onClick={() => this.showDlcOptions()}>
+            Expansion Packs
+          </DlcButton>
         </ExtendedViewContaier>
-      )
+      );
     }
 
     // Daily Forecast
@@ -573,19 +597,13 @@ class App extends Component {
           <H2f>Daily Forecast</H2f>
           <div>
             <section>
-              <ul>
-                {this.mapDailyForecastTime(this.state.allWeatherData.hourly.data)}
-              </ul>
-              <ul>
-                {this.mapDailyForecastDay(this.state.allWeatherData.hourly.data)}
-              </ul>
-              <ul>
-                {this.mapDailyForecastPrecip(this.state.allWeatherData.hourly.data)}
-              </ul>
+              <ul>{this.mapDailyForecastTime(this.state.allWeatherData.hourly.data)}</ul>
+              <ul>{this.mapDailyForecastDay(this.state.allWeatherData.hourly.data)}</ul>
+              <ul>{this.mapDailyForecastPrecip(this.state.allWeatherData.hourly.data)}</ul>
             </section>
           </div>
         </DailyForecastContainer>
-      )
+      );
     }
 
     // Weekly Forecast
@@ -596,19 +614,13 @@ class App extends Component {
           <H2f>Weekly Forecast</H2f>
           <div>
             <section>
-              <ul>
-                {this.mapWeeklyForecastTime(this.state.allWeatherData.daily.data)}
-              </ul>
-              <ul>
-                {this.mapWeeklyForecastDay(this.state.allWeatherData.daily.data)}
-              </ul>
-              <ul>
-                {this.mapWeeklyForecastPrecip(this.state.allWeatherData.daily.data)}
-              </ul>
+              <ul>{this.mapWeeklyForecastTime(this.state.allWeatherData.daily.data)}</ul>
+              <ul>{this.mapWeeklyForecastDay(this.state.allWeatherData.daily.data)}</ul>
+              <ul>{this.mapWeeklyForecastPrecip(this.state.allWeatherData.daily.data)}</ul>
             </section>
           </div>
         </WeeklyForecastContainer>
-      )
+      );
     }
 
     // Extensive Weather
@@ -617,15 +629,18 @@ class App extends Component {
       ExtensiveWeather = (
         <ExtensiveWeatherContainer>
           <H2f>Extensive Weather Data</H2f>
-          <LineHR/>
+          <LineHR />
           <section>
             <div>
               <H3f>Wind</H3f>
-              <H5f>{this.degreesToDirection(this.state.allWeatherData.currently.windBearing)} {Math.round( this.state.allWeatherData.currently.windSpeed  * 10 / 10)} km/h</H5f>
+              <H5f>
+                {this.degreesToDirection(this.state.allWeatherData.currently.windBearing)}{' '}
+                {Math.round((this.state.allWeatherData.currently.windSpeed * 10) / 10)} km/h
+              </H5f>
             </div>
             <div>
               <H3f>Humidity</H3f>
-              <H5f>{Math.round( this.state.allWeatherData.currently.humidity  * 10 / 10)}%</H5f>
+              <H5f>{Math.round((this.state.allWeatherData.currently.humidity * 10) / 10)}%</H5f>
             </div>
             <div>
               <H3f>Dew Point</H3f>
@@ -641,12 +656,12 @@ class App extends Component {
             </div>
             <div>
               <H3f>Air Pressure</H3f>
-              <H5f>{Math.round( this.state.allWeatherData.currently.pressure  * 10 / 10)}mb</H5f>
+              <H5f>{Math.round((this.state.allWeatherData.currently.pressure * 10) / 10)}mb</H5f>
             </div>
           </section>
-          <LineHR/>
+          <LineHR />
         </ExtensiveWeatherContainer>
-      )
+      );
     }
 
     //classy audio
@@ -655,7 +670,7 @@ class App extends Component {
       ClassyAudio = (
         <ClassyAudioContainer>
           <H2f>Posh Vibes</H2f>
-          <LineHR/>
+          <LineHR />
           <div>
             {/* displays the spotify playlist embed */}
             <iframe
@@ -668,24 +683,26 @@ class App extends Component {
               allow="encrypted-media"
             ></iframe>
           </div>
-          <LineHR/>
+          <LineHR />
         </ClassyAudioContainer>
-      )
+      );
     }
     // content if local Storage exists already (username + location)
     if (this.state.index >= 4 && this.state.bareView === true) {
       this.getAllWeatherData();
       bareView = (
-        <BareViewContainer style={{color: 'white'}}>
-          <LineHR/>
-              <div>
-                <H3f style={{textAlign: "center"}}>Currently</H3f>
-                <CurrentWeather style={{textAlign: "center"}}>{Math.round( this.state.allWeatherData.currently.temperature * 10 / 10)}°</CurrentWeather>
-              </div>
-          <LineHR/>
-          <DlcButton style={{marginTop: "36px"}} onClick={() => this.showDlcOptions()}>Expansion Packs</DlcButton>
+        <BareViewContainer style={{ color: 'white' }}>
+          <LineHR />
+          <div>
+            <H3f style={{ textAlign: 'center' }}>Currently</H3f>
+            <CurrentWeather style={{ textAlign: 'center' }}>{Math.round((this.state.allWeatherData.currently.temperature * 10) / 10)}°</CurrentWeather>
+          </div>
+          <LineHR />
+          <DlcButton style={{ marginTop: '36px' }} onClick={() => this.showDlcOptions()}>
+            Expansion Packs
+          </DlcButton>
         </BareViewContainer>
-      )
+      );
     } else {
       bareView = null;
     }
@@ -717,16 +734,18 @@ class App extends Component {
     return (
       <AppContainer className="App">
         {/* Spring to animate in the top data (very sutble) */}
-        <Spring delay={1000} from={{opacity: 0, paddingTop: "-100px"}} to={{opacity: 1, paddingTop: "24px" }}>
-          {styles =>
+        <Spring delay={1000} from={{ opacity: 0, paddingTop: '-100px' }} to={{ opacity: 1, paddingTop: '24px' }}>
+          {(styles) => (
             <TopBar style={styles}>
-              <p><span>{localStorage.getItem('username')}</span> | <span>{localStorage.getItem('location_name')}</span></p>
+              <p>
+                <span>{localStorage.getItem('username')}</span> | <span>{localStorage.getItem('location_name')}</span>
+              </p>
               <p>{this.getTheDate()}</p>
             </TopBar>
-          }
+          )}
         </Spring>
         <Header className="App-header">
-          <img src={logo} alt="posh weather logo. Golden P with Posh weather written below."/>
+          <img src={logo} alt="posh weather logo. Golden P with Posh weather written below." />
         </Header>
         <MainContentContainer>
           {DlcView}
@@ -740,9 +759,19 @@ class App extends Component {
         </MainContentContainer>
         <FooterContainer classname="loading-component">
           <ul>
-            <li>Built by <a href="https://lukesecomb.digital" target="_blank">Luke Secomb</a></li>
+            <li>
+              Built by{' '}
+              <a href="https://lukesecomb.digital" target="_blank">
+                Luke Secomb
+              </a>
+            </li>
             <li onClick={() => this.handleRemoveDLC()}>reset Weather Expansion Data</li>
-            <li>Powered by <a href="https://darksky.net/poweredby/" target="_blank" rel="nofollow noreferrer">Dark Sky</a></li>
+            <li>
+              Powered by{' '}
+              <a href="https://darksky.net/poweredby/" target="_blank" rel="nofollow noreferrer">
+                Dark Sky
+              </a>
+            </li>
           </ul>
         </FooterContainer>
       </AppContainer>
@@ -769,10 +798,10 @@ const UserInput = styled.input`
   &:focus {
     outline-color: -webkit-focus-ring-color;
     outline-style: auto;
-    outline-width: 0;  
+    outline-width: 0;
     border-bottom: 1px solid ${colors.gold};
   }
-`
+`;
 const DlcButton = styled.button`
   cursor: pointer;
   margin: 0 auto 48px auto;
@@ -782,18 +811,18 @@ const DlcButton = styled.button`
   padding: 8px 16px;
   background-color: transparent;
   color: ${colors.gold};
-  transition: .25s;
+  transition: 0.25s;
   &:hover {
     background-color: ${colors.gold_sub};
     padding: 8px 20px;
-    transition: .25s;
+    transition: 0.25s;
   }
   &:focus {
     outline-color: -webkit-focus-ring-color;
     outline-style: auto;
     outline-width: 0;
   }
-`
+`;
 const CurrentWeather = styled.h1`
   font-family: serif;
   font-size: 5rem;
@@ -801,7 +830,7 @@ const CurrentWeather = styled.h1`
   @media (min-width: ${view.tablet}) {
     font-size: 7.5rem;
   }
-`
+`;
 const H2f = styled.h2`
   font-size: 1.75rem;
   font-family: serif;
@@ -812,35 +841,35 @@ const H2f = styled.h2`
   @media (min-width: ${view.tablet}) {
     font-size: 2.5rem;
   }
-`
+`;
 const H3f = styled.h3`
   font-family: sans-serif;
   color: ${colors.gold};
   text-align: center;
   font-size: 1.25rem;
-`
+`;
 const H5f = styled.h5`
   font-family: serif;
   color: ${colors.white};
   text-align: center;
   font-size: 1.25rem;
-`
+`;
 const SerifText = styled.p`
   font-family: serif;
   color: ${colors.white};
-`
+`;
 const LineHR = styled.hr`
   width: 80%;
   border-color: ${colors.gold};
   @media (min-width: ${view.desktop}) {
     width: 50%;
   }
-`
+`;
 const LineHR100 = styled.hr`
   width: 100%;
   position: sticky;
   border-color: ${colors.gold};
-`
+`;
 const GraphDiv = styled.div`
   width: 75%;
   border-bottom: 2px solid ${colors.gold};
@@ -860,9 +889,9 @@ const GraphDiv = styled.div`
     height: 100%;
     margin: 0 auto;
     background-color: ${colors.gold};
-    opacity: .5;
+    opacity: 0.5;
   }
-`
+`;
 const DlcViewContainer = styled.div`
   > h2 {
     margin-bottom: 48px;
@@ -884,10 +913,9 @@ const DlcViewContainer = styled.div`
           color: ${colors.gold};
         }
       }
-
     }
   }
-`
+`;
 const ClassyAudioContainer = styled.div`
   div {
     width: 80%;
@@ -896,7 +924,7 @@ const ClassyAudioContainer = styled.div`
       width: 50%;
     }
   }
-`
+`;
 const WeeklyForecastContainer = styled.div`
   width: 80%;
   margin: 0 auto;
@@ -934,7 +962,7 @@ const WeeklyForecastContainer = styled.div`
           min-width: 150px;
           @media (min-width: ${view.desktop}) {
             min-width: 150px;
-          } 
+          }
           h3 {
             margin: 0 auto 8px auto;
             align-self: flex-end;
@@ -946,7 +974,7 @@ const WeeklyForecastContainer = styled.div`
       }
     }
   }
-`
+`;
 const DailyForecastContainer = styled.div`
   width: 80%;
   margin: 0 auto;
@@ -996,8 +1024,7 @@ const DailyForecastContainer = styled.div`
       }
     }
   }
-  
-`
+`;
 const ExtensiveWeatherContainer = styled.div`
   section {
     margin: 48px auto;
@@ -1016,7 +1043,7 @@ const ExtensiveWeatherContainer = styled.div`
       }
     }
   }
-`
+`;
 const ExtendedViewContaier = styled.div`
   section {
     width: 80%;
@@ -1033,12 +1060,12 @@ const ExtendedViewContaier = styled.div`
         display: grid;
         text-align: center;
         &:nth-of-type(1) {
-          h3 {          
+          h3 {
             margin: 48px auto 0 auto;
           }
         }
         &:nth-of-type(2) {
-          h3 {          
+          h3 {
             margin: 8px auto 0 auto;
           }
         }
@@ -1055,7 +1082,8 @@ const ExtendedViewContaier = styled.div`
         }
       }
     }
-    .side_view_left, .side_view_right {
+    .side_view_left,
+    .side_view_right {
       display: grid;
       align-content: center;
       h3 {
@@ -1068,14 +1096,13 @@ const ExtendedViewContaier = styled.div`
     .side_view_left {
       justify-content: flex-end;
       margin-right: 8px;
-
     }
     .side_view_right {
       justify-content: flex-start;
       margin-left: 8px;
     }
   }
-`
+`;
 const BareViewContainer = styled.div`
   div {
     display: grid;
@@ -1089,7 +1116,7 @@ const BareViewContainer = styled.div`
       margin: 12px auto 48px auto;
     }
   }
-`
+`;
 const TopBar = styled.div`
   width: 100%;
   height: auto;
@@ -1126,11 +1153,13 @@ const TopBar = styled.div`
       }
     }
   }
-`
+`;
 const AppContainer = styled.div`
   width: 100%;
   margin: 0;
   padding: 0;
+  display: flex;
+  flex-direction: column;
   font-family: ${fonts.sans};
   min-height: 100vh;
   /* Gradients for dayz */
@@ -1140,28 +1169,28 @@ const AppContainer = styled.div`
   background: -webkit-linear-gradient(left, ${colors.gradientGreyDark} 0%, ${colors.gradientGreyLight} 100%); /* Chrome10-25,Safari5.1-6 */
   background: linear-gradient(to right, ${colors.gradientGreyDark} 0%, ${colors.gradientGreyLight} 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='${colors.gradientGreyDark}', endColorstr='${colors.gradientGreyLight}',GradientType=1 ); /* IE6-9 */
-`
+`;
 const MainContentContainer = styled.section`
   width: 100%;
   height: auto;
   margin: 0;
   padding: 0;
-  display: grid;
+  display: flex;
+  flex-direction: column
+  flex: 1 0;
   align-content: center;
   justify-content: center;
-  grid-template-columns: 100%;
-  grid-template-rows: 100%;
   overflow: hidden;
   > div {
     margin-bottom: 175px;
   }
-`
+`;
 const Header = styled.header`
   width: 100%;
   height: 10vh;
   padding: 3% 0 10% 0;
   color: ${colors.white};
-  display: grid;
+  display: flex;
   @media (min-width: ${view.tablet}) {
     width: 100%;
     height: 12vh;
@@ -1173,7 +1202,7 @@ const Header = styled.header`
     height: 100%;
     margin: 0 auto;
   }
-`
+`;
 const WelcomeSliderContainer = styled.div`
   width: 90%;
   min-height: 250px;
@@ -1183,48 +1212,48 @@ const WelcomeSliderContainer = styled.div`
   @media (min-width: ${view.mobile}) {
     width: 80%;
     min-height: 250px;
-    padding: 20% 10% 10% 10%; 
+    padding: 20% 10% 10% 10%;
   }
   @media (min-width: ${view.tablet}) {
     width: 70%;
     min-height: 250px;
-    padding: 15% 15% 10% 15%; 
+    padding: 15% 15% 10% 15%;
   }
   @media (min-width: ${view.desktop}) {
     width: 50%;
     min-height: 250px;
-    padding: 10% 25% 10% 25%; 
+    padding: 10% 25% 10% 25%;
   }
-`
+`;
 const LocationOptions = styled.li`
   list-style-type: none;
   font-size: 2.25rem;
   color: ${colors.gold_sub};
-  transition: .5s;
+  transition: 0.5s;
   cursor: pointer;
   &:hover {
     color: ${colors.gold};
-    transition: .5s;
+    transition: 0.5s;
   }
-`
+`;
 const WelcomeContainer = styled.div`
-    position: relative;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    font-family: ${fonts.serif};
-    h2 {
-        color: white;
-        position: absolute;
-        top: 0;
-    }
-    button {
-        position: absolute;
-        top: -10%;
-        width: auto;
-        font-size: 1rem;
-    }
-`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  font-family: ${fonts.serif};
+  h2 {
+    color: white;
+    position: absolute;
+    top: 0;
+  }
+  button {
+    position: absolute;
+    top: -10%;
+    width: auto;
+    font-size: 1rem;
+  }
+`;
 const SlideItem = styled.div`
   color: white;
   position: absolute;
@@ -1246,7 +1275,7 @@ const SlideItem = styled.div`
       font-size: 1rem;
     }
   }
-`
+`;
 const FooterContainer = styled.footer`
   width: 100%;
   margin: 0;
@@ -1261,26 +1290,26 @@ const FooterContainer = styled.footer`
     margin: 0;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    opacity: .5;
-    transition: .5s;
+    opacity: 0.5;
+    transition: 0.5s;
     &:hover {
       opacity: 1;
-      transition: .5s;
+      transition: 0.5s;
     }
     li {
       color: ${colors.white};
-      font-size: .75rem;
+      font-size: 0.75rem;
       &:nth-of-type(2) {
         cursor: pointer;
       }
       a {
         color: ${colors.gold};
         text-decoration: none;
-        transition: .5s;
+        transition: 0.5s;
         opacity: 1;
         &:hover {
-          opacity: .5;
-          transition: .5s;
+          opacity: 0.5;
+          transition: 0.5s;
         }
       }
       &:nth-child(1) {
@@ -1294,4 +1323,4 @@ const FooterContainer = styled.footer`
       }
     }
   }
-`
+`;
