@@ -174,10 +174,12 @@ class App extends Component {
       method: 'GET',
       url: `${process.env.NODE_ENV === 'development' ? herokuCORS : ''}${darkSkyUrl}${apiKey}/${lat},${lon}`,
       responseType: 'json',
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-      },
-      mode: 'no-cors',
+      ...(process.env.NODE_ENV === 'development' && {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
+        mode: 'no-cors',
+      }),
       params: {
         units: 'auto',
       },
