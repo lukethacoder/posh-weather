@@ -20,7 +20,7 @@ import DlcData from './config/dlc_data';
 const apiKey = process.env.REACT_APP_CONFIG_DARK_SKY;
 // set constant url paths for easier use when fetching data
 const darkSkyUrl = 'https://api.darksky.net/forecast/';
-const herokuCORS = 'https://cors-anywhere.herokuapp.com/';
+const CORS_URL = process.env.REACT_APP_PROXY_URL ? process.env.REACT_APP_PROXY_URL : 'https://cors-anywhere.herokuapp.com/';
 
 // init mapbox
 const mapboxKey = process.env.REACT_APP_MAPBOX_CONFIG;
@@ -166,20 +166,18 @@ class App extends Component {
     let lat = localStorage.getItem('location_lat');
 
     // API calling DarkSky passing in
-    //    - herokuCORS (to stop Cross Origin errors)
+    //    - CORS_URL (to stop Cross Origin errors)
     //    - darkSkyUrl (constant defined globally / static url wont change)
     //    - apiKey (secret API key imported from .env file)
     //    - lon/lat (use the previously set variables of lat + lon)
     axios({
       method: 'GET',
-      url: `${process.env.NODE_ENV === 'development' ? herokuCORS : ''}${darkSkyUrl}${apiKey}/${lat},${lon}`,
+      url: `${CORS_URL}${darkSkyUrl}${apiKey}/${lat},${lon}`,
       responseType: 'json',
-      ...(process.env.NODE_ENV === 'development' && {
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-        },
-        mode: 'no-cors',
-      }),
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
+      mode: 'no-cors',
       params: {
         units: 'auto',
       },
