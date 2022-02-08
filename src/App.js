@@ -761,14 +761,14 @@ class App extends Component {
           <ul>
             <li>
               Built by{' '}
-              <a href="https://lukesecomb.digital" target="_blank">
+              <a href="https://lukesecomb.digital" target="_blank" rel="noopener noreferrer">
                 Luke Secomb
               </a>
             </li>
             <li onClick={() => this.handleRemoveDLC()}>reset Weather Expansion Data</li>
             <li>
               Powered by{' '}
-              <a href="https://darksky.net/poweredby/" target="_blank" rel="nofollow noreferrer">
+              <a href="https://darksky.net/poweredby/" target="_blank" rel="noopener nofollow noreferrer">
                 Dark Sky
               </a>
             </li>
